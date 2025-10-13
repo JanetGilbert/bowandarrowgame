@@ -32,11 +32,11 @@ export class Game extends Scene {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   spaceKey: Phaser.Input.Keyboard.Key;
   qKey: Phaser.Input.Keyboard.Key;
-  aKey: Phaser.Input.Keyboard.Key;
+  wKey: Phaser.Input.Keyboard.Key;
   
   // Game settings
   archerSpeed: number = 200;
-  balloonSpeed: number = 30;
+  balloonSpeed: number = 50; // Increased speed for better gameplay
   arrowSpeed: number = 400;
 
   constructor() {
@@ -47,17 +47,17 @@ export class Game extends Scene {
     // Set up the game world
     this.cameras.main.setBackgroundColor(0x90EE90); // Light green background
     
-    // Create archer sprite (simple colored rectangle for now)
-    this.archer = this.add.rectangle(100, 400, 40, 80, 0x8B4513); // Brown archer
+    // Create archer sprite at bottom of screen
+    this.archer = this.add.rectangle(this.scale.width / 2, this.scale.height - 60, 40, 80, 0x8B4513); // Brown archer
     this.archer.setOrigin(0.5, 0.5);
     
     // Create bow sprite
-    this.bow = this.add.rectangle(120, 400, 20, 60, 0x654321); // Darker brown bow
+    this.bow = this.add.rectangle(this.scale.width / 2, this.scale.height - 60, 20, 60, 0x654321); // Darker brown bow
     this.bow.setOrigin(0.5, 0.5);
     
     // Create arrow sprite (initially hidden)
-    this.arrow = this.add.rectangle(140, 400, 30, 4, 0x696969); // Gray arrow
-    this.arrow.setOrigin(0, 0.5);
+    this.arrow = this.add.rectangle(this.scale.width / 2, this.scale.height - 60, 4, 30, 0x696969); // Gray arrow (vertical)
+    this.arrow.setOrigin(0.5, 1); // Anchor at bottom
     this.arrow.setVisible(false);
     
     // Create balloon group
@@ -113,48 +113,76 @@ export class Game extends Scene {
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.spaceKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.qKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-    this.aKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    this.wKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W);
   }
 
   createBalloons() {
-    // Create 10 balloons in a staggered horizontal line
-    const startX = 300;
-    const startY = 500;
-    const balloonSpacing = 50;
+    // Create balloons that move left to right across the screen
+    const screenWidth = this.scale.width;
+    const screenHeight = this.scale.height;
+    const archerY = this.scale.height - 60;
     
-    for (let i = 0; i < 10; i++) {
-      const balloon = this.add.circle(
-        startX + (i * balloonSpacing),
-        startY + (Math.random() * 20 - 10), // Slight vertical stagger
-        15,
-        0xFF0000 // Red balloon
-      );
-      
-      // Store balloon data for manual movement
-      (balloon as any).velocityY = -this.balloonSpeed;
-      
-      // Add balloon to group
-      this.balloons.add(balloon);
-      
-      // Remove balloon when it goes off screen
-      this.time.delayedCall(15000, () => {
-        if (balloon.active) {
-          balloon.destroy();
-        }
-      });
+    // Calculate available space above archer, avoiding score area and archer
+    const scoreAreaHeight = 100; // Reserve space for score at top
+    const archerAreaHeight = 80; // Reserve space for archer at bottom
+    const availableHeight = archerY - scoreAreaHeight - archerAreaHeight; // Leave space for archer
+    const balloonRadius = 15;
+    const minSpacing = 30; // Smaller spacing to fit more balloons
+    
+    // Calculate optimal grid based on screen size
+    const maxBalloonsPerRow = Math.floor(screenWidth / minSpacing);
+    const maxRows = Math.floor(availableHeight / minSpacing);
+    
+    // Use calculated values to fill the entire space
+    const balloonsPerRow = Math.max(8, Math.min(maxBalloonsPerRow, 25)); // More balloons for full coverage
+    const rows = Math.max(6, Math.min(maxRows, 15)); // More rows to fill vertical space
+    
+    // Calculate actual spacing to fill the entire available area
+    const rowSpacing = availableHeight / (rows - 1); // Distribute evenly across full height
+    const balloonSpacing = screenWidth / balloonsPerRow;
+    
+    const startY = scoreAreaHeight + 20; // Start just below score area
+    
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < balloonsPerRow; col++) {
+        const balloon = this.add.circle(
+          -50, // Start off-screen to the left
+          startY + (row * rowSpacing), // Evenly spaced rows from top down
+          15,
+          0xFF0000 // Red balloon
+        );
+        
+        // Store balloon data for manual movement (left to right)
+        (balloon as any).velocityX = this.balloonSpeed;
+        (balloon as any).velocityY = 0;
+        (balloon as any).row = row;
+        (balloon as any).col = col;
+        (balloon as any).rowSpacing = rowSpacing;
+        (balloon as any).startY = startY;
+        
+        // Add balloon to group
+        this.balloons.add(balloon);
+        
+        // Remove balloon when it goes off screen
+        this.time.delayedCall(15000, () => {
+          if (balloon.active) {
+            balloon.destroy();
+          }
+        });
+      }
     }
   }
 
   override update() {
-    // Handle archer movement (Q and A keys)
+    // Handle archer movement (Q and W keys) - horizontal movement
     if (!this.arrowInFlight) {
-      if (this.qKey.isDown && this.archer.y > 100) {
-        this.archer.y -= this.archerSpeed * this.game.loop.delta / 1000;
-        this.bow.y = this.archer.y;
+      if (this.qKey.isDown && this.archer.x > 50) {
+        this.archer.x -= this.archerSpeed * this.game.loop.delta / 1000;
+        this.bow.x = this.archer.x;
       }
-      if (this.aKey.isDown && this.archer.y < 600) {
-        this.archer.y += this.archerSpeed * this.game.loop.delta / 1000;
-        this.bow.y = this.archer.y;
+      if (this.wKey.isDown && this.archer.x < this.scale.width - 50) {
+        this.archer.x += this.archerSpeed * this.game.loop.delta / 1000;
+        this.bow.x = this.archer.x;
       }
     }
 
@@ -183,8 +211,8 @@ export class Game extends Scene {
       // Check if arrow hits balloons
       this.checkArrowCollisions();
       
-      // Check if arrow goes off screen
-      if (this.arrow.x > 1000) {
+      // Check if arrow goes off screen (top of screen)
+      if (this.arrow.y < -50) {
         this.resetArrow();
       }
     }
@@ -192,10 +220,14 @@ export class Game extends Scene {
     // Update balloons
     this.balloons.children.entries.forEach((balloon: any) => {
       if (balloon.active) {
+        balloon.x += balloon.velocityX * this.game.loop.delta / 1000;
         balloon.y += balloon.velocityY * this.game.loop.delta / 1000;
         
-        // Remove balloon if it goes off screen
-        if (balloon.y < -50) {
+        // Maintain proper spacing in rows as they move
+        balloon.y = balloon.startY + (balloon.row * balloon.rowSpacing);
+        
+        // Remove balloon if it goes off screen (right side) - let them travel the full width
+        if (balloon.x > this.scale.width + 100) {
           balloon.destroy();
         }
       }
@@ -210,14 +242,14 @@ export class Game extends Scene {
     this.arrowsText.setText(`Arrows: ${this.arrowsRemaining}`);
     
     // Position arrow at archer
-    this.arrow.setPosition(this.archer.x + 40, this.archer.y);
+    this.arrow.setPosition(this.archer.x, this.archer.y - 40);
     this.arrow.setVisible(true);
     
-    // Calculate arrow velocity based on bow power
+    // Calculate arrow velocity based on bow power (upward)
     const power = this.bowDrawPower / this.maxBowPower;
     this.arrowVelocity = new Phaser.Math.Vector2(
-      this.arrowSpeed * power,
-      0 // No vertical component for now
+      0, // No horizontal component for now
+      -this.arrowSpeed * power // Negative Y for upward movement
     );
     
     // Reset bow
