@@ -34,6 +34,11 @@ export class Game extends Scene {
   qKey: Phaser.Input.Keyboard.Key;
   wKey: Phaser.Input.Keyboard.Key;
   
+  // Touch/Mouse controls
+  isDragging: boolean = false;
+  dragStartX: number = 0;
+  archerStartX: number = 0;
+  
   // Game settings
   archerSpeed: number = 200;
   balloonSpeed: number = 50; // Increased speed for better gameplay
@@ -114,6 +119,33 @@ export class Game extends Scene {
     this.spaceKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.qKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     this.wKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    
+    // Touch/Mouse drag controls
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      this.isDragging = true;
+      this.dragStartX = pointer.x;
+      this.archerStartX = this.archer.x;
+    });
+    
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (this.isDragging) {
+        const deltaX = pointer.x - this.dragStartX;
+        const newX = this.archerStartX + deltaX;
+        
+        // Keep archer within screen bounds
+        const clampedX = Phaser.Math.Clamp(newX, 50, this.scale.width - 50);
+        this.archer.x = clampedX;
+        this.bow.x = clampedX;
+      }
+    });
+    
+    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (this.isDragging) {
+        this.isDragging = false;
+        // Fire arrow on release
+        this.fireArrow();
+      }
+    });
   }
 
   createBalloons() {
@@ -175,18 +207,17 @@ export class Game extends Scene {
 
   override update() {
     // Handle archer movement (Q and W keys) - horizontal movement
-    if (!this.arrowInFlight) {
-      if (this.qKey.isDown && this.archer.x > 50) {
-        this.archer.x -= this.archerSpeed * this.game.loop.delta / 1000;
-        this.bow.x = this.archer.x;
-      }
-      if (this.wKey.isDown && this.archer.x < this.scale.width - 50) {
-        this.archer.x += this.archerSpeed * this.game.loop.delta / 1000;
-        this.bow.x = this.archer.x;
-      }
+    // Allow movement even when arrow is in flight
+    if (this.qKey.isDown && this.archer.x > 50) {
+      this.archer.x -= this.archerSpeed * this.game.loop.delta / 1000;
+      this.bow.x = this.archer.x;
+    }
+    if (this.wKey.isDown && this.archer.x < this.scale.width - 50) {
+      this.archer.x += this.archerSpeed * this.game.loop.delta / 1000;
+      this.bow.x = this.archer.x;
     }
 
-    // Handle bow drawing and arrow firing
+    // Handle bow drawing and arrow firing (keyboard)
     if (this.spaceKey.isDown && !this.arrowInFlight) {
       if (!this.isDrawingBow) {
         this.isDrawingBow = true;
@@ -199,8 +230,8 @@ export class Game extends Scene {
       // Visual feedback for bow drawing
       this.bow.setScale(1, 1 + (this.bowDrawPower / this.maxBowPower) * 0.5);
     } else if (this.isDrawingBow && this.spaceKey.isUp) {
-      // Fire arrow
-      this.fireArrow();
+      // Fire arrow with keyboard power
+      this.fireArrowWithPower();
     }
 
     // Update arrow in flight
@@ -245,7 +276,36 @@ export class Game extends Scene {
     this.arrow.setPosition(this.archer.x, this.archer.y - 40);
     this.arrow.setVisible(true);
     
-    // Calculate arrow velocity based on bow power (upward)
+    // Calculate arrow velocity (upward with some power)
+    const power = 0.8; // Default power for drag firing
+    this.arrowVelocity = new Phaser.Math.Vector2(
+      0, // No horizontal component for now
+      -this.arrowSpeed * power // Negative Y for upward movement
+    );
+    
+    // Reset bow
+    this.isDrawingBow = false;
+    this.bowDrawPower = 0;
+    this.bow.setScale(1, 1);
+    
+    // Check for game over
+    if (this.arrowsRemaining <= 0) {
+      this.gameOver();
+    }
+  }
+
+  fireArrowWithPower() {
+    if (this.arrowInFlight) return;
+    
+    this.arrowInFlight = true;
+    this.arrowsRemaining--;
+    this.arrowsText.setText(`Arrows: ${this.arrowsRemaining}`);
+    
+    // Position arrow at archer
+    this.arrow.setPosition(this.archer.x, this.archer.y - 40);
+    this.arrow.setVisible(true);
+    
+    // Calculate arrow velocity based on bow power (keyboard)
     const power = this.bowDrawPower / this.maxBowPower;
     this.arrowVelocity = new Phaser.Math.Vector2(
       0, // No horizontal component for now

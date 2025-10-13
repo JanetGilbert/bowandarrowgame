@@ -79,7 +79,7 @@ export class MainMenu extends Scene {
     // Instructions text
     if (!this.instructions) {
       this.instructions = this.add
-        .text(0, 0, 'Q/W: Move Left/Right\nSPACE: Draw & Fire Arrow\nHit the red balloons!', {
+        .text(0, 0, 'Drag to Move & Fire\nQ/W: Move Left/Right\nSPACE: Draw & Fire Arrow\nHit the red balloons!', {
           fontFamily: 'Arial',
           fontSize: '20px',
           color: '#ffffff',
