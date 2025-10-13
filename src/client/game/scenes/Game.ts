@@ -6,7 +6,7 @@ export class Game extends Scene {
   score: number = 0;
   highScore: number = 0;
   level: number = 1;
-  arrowsRemaining: number = 20;
+  arrowsRemaining: number = 10;
   
   // Game objects
   archer: Phaser.GameObjects.Rectangle;
@@ -48,20 +48,29 @@ export class Game extends Scene {
     super('Game');
   }
 
+  init() {
+    // Reset game state when starting new game
+    this.score = 0;
+    this.arrowsRemaining = 10;
+    this.arrowInFlight = false;
+    this.isDrawingBow = false;
+    this.bowDrawPower = 0;
+  }
+
   create() {
     // Set up the game world
     this.cameras.main.setBackgroundColor(0x90EE90); // Light green background
     
-    // Create archer sprite at bottom of screen
-    this.archer = this.add.rectangle(this.scale.width / 2, this.scale.height - 60, 40, 80, 0x8B4513); // Brown archer
+    // Create archer sprite at bottom of screen (fixed portrait dimensions)
+    this.archer = this.add.rectangle(200, 540, 40, 80, 0x8B4513); // Brown archer
     this.archer.setOrigin(0.5, 0.5);
     
     // Create bow sprite
-    this.bow = this.add.rectangle(this.scale.width / 2, this.scale.height - 60, 20, 60, 0x654321); // Darker brown bow
+    this.bow = this.add.rectangle(200, 540, 20, 60, 0x654321); // Darker brown bow
     this.bow.setOrigin(0.5, 0.5);
     
     // Create arrow sprite (initially hidden)
-    this.arrow = this.add.rectangle(this.scale.width / 2, this.scale.height - 60, 4, 30, 0x696969); // Gray arrow (vertical)
+    this.arrow = this.add.rectangle(200, 540, 4, 30, 0x696969); // Gray arrow (vertical)
     this.arrow.setOrigin(0.5, 1); // Anchor at bottom
     this.arrow.setVisible(false);
     
@@ -71,6 +80,10 @@ export class Game extends Scene {
     
     // Create UI
     this.createUI();
+    
+    // Update UI with initial values
+    this.scoreText.setText('Score: 0');
+    this.arrowsText.setText('Arrows: 10');
     
     // Set up input
     this.setupInput();
@@ -88,28 +101,28 @@ export class Game extends Scene {
   }
 
   createUI() {
-    // Score display
+    // Score display (fixed portrait positioning)
     this.scoreText = this.add.text(20, 20, 'Score: 0', {
       fontFamily: 'Arial',
-      fontSize: '24px',
+      fontSize: '18px',
       color: '#000000'
     });
     
-    this.highScoreText = this.add.text(20, 50, 'High Score: 0', {
+    this.highScoreText = this.add.text(20, 45, 'High Score: 0', {
       fontFamily: 'Arial',
-      fontSize: '20px',
+      fontSize: '16px',
       color: '#000000'
     });
     
-    this.levelText = this.add.text(400, 20, 'Level 1', {
+    this.levelText = this.add.text(200, 20, 'Level 1', {
       fontFamily: 'Arial',
-      fontSize: '24px',
+      fontSize: '18px',
       color: '#000000'
     });
     
-    this.arrowsText = this.add.text(800, 20, 'Arrows: 20', {
+    this.arrowsText = this.add.text(300, 20, 'Arrows: 10', {
       fontFamily: 'Arial',
-      fontSize: '20px',
+      fontSize: '16px',
       color: '#000000'
     });
   }
@@ -132,8 +145,8 @@ export class Game extends Scene {
         const deltaX = pointer.x - this.dragStartX;
         const newX = this.archerStartX + deltaX;
         
-        // Keep archer within screen bounds
-        const clampedX = Phaser.Math.Clamp(newX, 50, this.scale.width - 50);
+        // Keep archer within fixed portrait bounds
+        const clampedX = Phaser.Math.Clamp(newX, 50, 350);
         this.archer.x = clampedX;
         this.bow.x = clampedX;
       }
@@ -149,25 +162,21 @@ export class Game extends Scene {
   }
 
   createBalloons() {
-    // Create balloons that move left to right across the screen
-    const screenWidth = this.scale.width;
-    const screenHeight = this.scale.height;
-    const archerY = this.scale.height - 60;
+    // Create balloons for fixed portrait dimensions (400x600)
+    const screenWidth = 400;
+    const screenHeight = 600;
+    const archerY = 540;
     
     // Calculate available space above archer, avoiding score area and archer
-    const scoreAreaHeight = 100; // Reserve space for score at top
-    const archerAreaHeight = 80; // Reserve space for archer at bottom
+    const scoreAreaHeight = 80; // Reserve space for score at top
+    const archerAreaHeight = 60; // Reserve space for archer at bottom
     const availableHeight = archerY - scoreAreaHeight - archerAreaHeight; // Leave space for archer
-    const balloonRadius = 15;
-    const minSpacing = 30; // Smaller spacing to fit more balloons
+    const balloonRadius = 12;
+    const minSpacing = 25; // Smaller spacing for portrait
     
-    // Calculate optimal grid based on screen size
-    const maxBalloonsPerRow = Math.floor(screenWidth / minSpacing);
-    const maxRows = Math.floor(availableHeight / minSpacing);
-    
-    // Use calculated values to fill the entire space
-    const balloonsPerRow = Math.max(8, Math.min(maxBalloonsPerRow, 25)); // More balloons for full coverage
-    const rows = Math.max(6, Math.min(maxRows, 15)); // More rows to fill vertical space
+    // Calculate optimal grid for portrait
+    const balloonsPerRow = Math.floor(screenWidth / minSpacing);
+    const rows = Math.floor(availableHeight / minSpacing);
     
     // Calculate actual spacing to fill the entire available area
     const rowSpacing = availableHeight / (rows - 1); // Distribute evenly across full height
@@ -212,7 +221,7 @@ export class Game extends Scene {
       this.archer.x -= this.archerSpeed * this.game.loop.delta / 1000;
       this.bow.x = this.archer.x;
     }
-    if (this.wKey.isDown && this.archer.x < this.scale.width - 50) {
+    if (this.wKey.isDown && this.archer.x < 350) { // Fixed portrait width bounds
       this.archer.x += this.archerSpeed * this.game.loop.delta / 1000;
       this.bow.x = this.archer.x;
     }
@@ -257,8 +266,8 @@ export class Game extends Scene {
         // Maintain proper spacing in rows as they move
         balloon.y = balloon.startY + (balloon.row * balloon.rowSpacing);
         
-        // Remove balloon if it goes off screen (right side) - let them travel the full width
-        if (balloon.x > this.scale.width + 100) {
+        // Remove balloon if it goes off screen (right side) - fixed portrait width
+        if (balloon.x > 450) {
           balloon.destroy();
         }
       }
@@ -288,9 +297,11 @@ export class Game extends Scene {
     this.bowDrawPower = 0;
     this.bow.setScale(1, 1);
     
-    // Check for game over
+    // Check for game over when arrows run out
     if (this.arrowsRemaining <= 0) {
-      this.gameOver();
+      this.time.delayedCall(1000, () => {
+        this.gameOver();
+      });
     }
   }
 
@@ -317,9 +328,11 @@ export class Game extends Scene {
     this.bowDrawPower = 0;
     this.bow.setScale(1, 1);
     
-    // Check for game over
+    // Check for game over when arrows run out
     if (this.arrowsRemaining <= 0) {
-      this.gameOver();
+      this.time.delayedCall(1000, () => {
+        this.gameOver();
+      });
     }
   }
 

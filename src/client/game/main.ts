@@ -11,14 +11,21 @@ import { Preloader } from './scenes/Preloader';
 const config: Phaser.Types.Core.GameConfig = {
   type: AUTO,
   parent: 'game-container',
-  backgroundColor: '#028af8',
+  backgroundColor: '#000000', // Black background for borders
   scale: {
-    // Keep a fixed game resolution but automatically scale it to fit within the available
-    // web-view / device while maintaining aspect ratio.
-    mode: Phaser.Scale.RESIZE,
+    // Force portrait orientation with black borders
+    mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 1024,
-    height: 768,
+    width: 400, // Portrait width
+    height: 600, // Portrait height (3:2 ratio)
+    min: {
+      width: 400,
+      height: 600
+    },
+    max: {
+      width: 400,
+      height: 600
+    }
   },
   scene: [Boot, Preloader, MainMenu, MainGame, GameOver],
 };
