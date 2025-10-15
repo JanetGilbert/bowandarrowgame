@@ -16,14 +16,12 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
     this.anims.play('idle');
 
+    this.setInteractive();
+
       // Listen to the browser window for pointer releases outside the canvas
     /*document.addEventListener('mouseup', function(event) {
         console.log('Mouse button released, even outside the window!');
     });*/
-  }
-
-  private range(start: number, end: number): number[] {
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }
 
   createAnimations() {
@@ -31,7 +29,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
     if (!this.scene.anims.exists('walk_left')) {
       this.scene.anims.create({
         key: 'walk_left',
-        frames: this.scene.anims.generateFrameNumbers('archer', { frames: this.range(16, 31) }),
+        frames: this.scene.anims.generateFrameNumbers('archer', { start: 16, end: 31 } ),
         frameRate: 8,
         repeat: -1
       });
@@ -40,7 +38,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
     if (!this.scene.anims.exists('walk_right')) {
       this.scene.anims.create({
         key: 'walk_right',
-        frames: this.scene.anims.generateFrameNumbers('archer', { frames: this.range(32, 47) }),
+        frames: this.scene.anims.generateFrameNumbers('archer', { start: 32, end: 47 } ),
         frameRate: 8,
         repeat: -1
       });
@@ -77,6 +75,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
     });
     
     this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+
       if (this.isDragging) {
         const deltaX = pointer.x - this.dragStartX;
         const newX = this.archerStartX + deltaX;
@@ -85,12 +84,17 @@ export default class Player extends Phaser.GameObjects.Sprite {
         const clampedX = Phaser.Math.Clamp(newX, 50, 350);
         this.x = clampedX;
       }
+      else if (pointer.isDown) {
+          this.isDragging = true;
+          this.dragStartX = pointer.x;
+          this.archerStartX = this.x;
+      }
     });
     
     this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
       if (this.isDragging) {
         this.isDragging = false;
-        this.onDragEnd();
+        this.fireBow();
       }
     });
 
@@ -114,9 +118,8 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
 
 
-  onDragEnd() {
-    // Override this method in the game scene if needed
-    // or emit an event that the game scene can listen to
+  fireBow() {
+    
   }
 
   override update() {
