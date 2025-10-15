@@ -43,10 +43,6 @@ export class Game extends Scene {
     this.load.spritesheet('archer', 'assets/archer.png', { frameWidth: 144, frameHeight: 144 });
   }
 
-  private range(start: number, end: number): number[] {
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  }
-
 
   create() {
     // Set up the game world
@@ -60,36 +56,7 @@ export class Game extends Scene {
     this.scoreText.setText('Score: 0');
     this.arrowsText.setText('Arrows: 10');
 
-    // Animations
-    this.anims.create({
-        key: 'walk_left',
-        frames: this.anims.generateFrameNumbers('archer', { frames: this.range(16, 31) }),
-        frameRate: 8,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'walk_right',
-        frames: this.anims.generateFrameNumbers('archer', { frames: this.range(32, 47) }),
-        frameRate: 8,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'idle',
-        frames: this.anims.generateFrameNumbers('archer', { frames: [48, 49]}),
-        frameRate: 8,
-        repeat: -1
-    });
-
-      this.anims.create({
-        key: 'draw',
-        frames: this.anims.generateFrameNumbers('archer', { frames: [63, 62, 61, 60]}),
-        frameRate: 8,
-        repeat: -1
-    });
-
-    // Create the archer sprite
+    // Create the archer sprite (animations are handled internally)
     this.archer = new Archer(this, 200, 500);
     
 
