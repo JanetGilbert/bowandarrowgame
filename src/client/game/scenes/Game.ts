@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import * as Phaser from 'phaser';
 import Archer from '../objects/archer.js';
 import Balloon from '../objects/balloon.js';
+import Arrow from '../objects/arrow.js';
 
 export class Game extends Scene {
   // Game state
@@ -53,6 +54,8 @@ export class Game extends Scene {
 
     this.archer = new Archer(this, 200, 500);
     this.addBalloons();
+    this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
+
 
     //this.archer.anims.play('idle');
 
@@ -64,6 +67,10 @@ export class Game extends Scene {
       callbackScope: this,
       loop: true
     });*/
+  }
+
+  hitBalloon(arrow: any, balloon: any) {
+      balloon.destroy();
   }
 
   createUI() {
