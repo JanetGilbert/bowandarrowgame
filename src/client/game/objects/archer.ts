@@ -84,11 +84,6 @@ export default class Player extends Phaser.GameObjects.Sprite {
         const clampedX = Phaser.Math.Clamp(newX, 50, 350);
         this.x = clampedX;
       }
-      else if (pointer.isDown) {
-          this.isDragging = true;
-          this.dragStartX = pointer.x;
-          this.archerStartX = this.x;
-      }
     });
     
     this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
