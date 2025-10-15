@@ -1,31 +1,25 @@
-export default class Player extends Phaser.GameObjects.Sprite {
-  // Touch/Mouse controls
+import Arrow from '../objects/arrow.js';
+
+export default class Archer extends Phaser.GameObjects.Sprite {
+
   isDragging: boolean = false;
   dragStartX: number = 0;
   archerStartX: number = 0;
 
+  arrow: Arrow;
+
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'archer');
     scene.add.existing(this);
-    
-    // Create animations for this archer
+
     this.createAnimations();
-    
-    // Set up input handling for this archer
     this.setupInput();
-
     this.anims.play('idle');
-
     this.setInteractive();
-
-      // Listen to the browser window for pointer releases outside the canvas
-    /*document.addEventListener('mouseup', function(event) {
-        console.log('Mouse button released, even outside the window!');
-    });*/
+    this.arrow = new Arrow(this.scene);
   }
 
   createAnimations() {
-    // Only create animations if they don't already exist
     if (!this.scene.anims.exists('walk_left')) {
       this.scene.anims.create({
         key: 'walk_left',
@@ -64,7 +58,6 @@ export default class Player extends Phaser.GameObjects.Sprite {
   }
 
   setupInput() {
-    // Make this sprite interactive
     this.setInteractive();
     
     // Set up scene-level input for drag controls
@@ -100,11 +93,6 @@ export default class Player extends Phaser.GameObjects.Sprite {
       }
     });
 
-
-    this.scene.input.on('gameout', (pointer: Phaser.Input.Pointer) => {
-      console.log('Game out');
-    });
-
     document.addEventListener('mouseleave', (event) => {
       console.log('mouse leave');
       this.isDragging = false;
@@ -114,12 +102,13 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
 
   fireBow() {
-    
+    this.arrow.fireArrow(this.x, this.y - 20);
   }
 
   override update() {
     // Player-specific update logic
     this.handleMovement();
+    this.arrow.update();
   }
 
   handleMovement() {

@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import * as Phaser from 'phaser';
 import Archer from '../objects/archer.js';
 
+
 export class Game extends Scene {
   // Game state
   score: number = 0;
@@ -11,7 +12,7 @@ export class Game extends Scene {
   
   // Game objects
   archer: Archer;
-  arrow: Phaser.GameObjects.Rectangle;
+
   balloons: Phaser.GameObjects.Group;
   balloonPops: Phaser.GameObjects.Group;
   
@@ -41,6 +42,7 @@ export class Game extends Scene {
 
   preload() {
     this.load.spritesheet('archer', 'assets/archer.png', { frameWidth: 144, frameHeight: 144 });
+    this.load.image('arrow', 'assets/arrow.png');
   }
 
 
@@ -56,9 +58,8 @@ export class Game extends Scene {
     this.scoreText.setText('Score: 0');
     this.arrowsText.setText('Arrows: 10');
 
-    // Create the archer sprite (animations are handled internally)
+    // Create the archer sprite 
     this.archer = new Archer(this, 200, 500);
-    
 
     //this.archer.anims.play('idle');
 
@@ -100,7 +101,7 @@ export class Game extends Scene {
   }
 
   override update() {
-    
+    this.archer.update();
   }
 
 

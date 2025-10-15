@@ -12,6 +12,9 @@ const config: Phaser.Types.Core.GameConfig = {
   type: AUTO,
   parent: 'game-container',
   backgroundColor: '#000000', // Black background for borders
+  physics: {
+      default: 'arcade'
+  },
   scale: {
     // Force portrait orientation with black borders
     mode: Phaser.Scale.FIT,
