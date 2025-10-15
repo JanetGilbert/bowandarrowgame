@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import * as Phaser from 'phaser';
 import Archer from '../objects/archer.js';
-
+import Balloon from '../objects/balloon.js';
 
 export class Game extends Scene {
   // Game state
@@ -12,22 +12,13 @@ export class Game extends Scene {
   
   // Game objects
   archer: Archer;
-
   balloons: Phaser.GameObjects.Group;
-  balloonPops: Phaser.GameObjects.Group;
   
   // UI elements
   scoreText: Phaser.GameObjects.Text;
   highScoreText: Phaser.GameObjects.Text;
   levelText: Phaser.GameObjects.Text;
   arrowsText: Phaser.GameObjects.Text;
-  
-
-
-  
-  // Game settings
-  balloonSpeed: number = 50; // Increased speed for better gameplay
-  arrowSpeed: number = 400;
 
   constructor() {
     super('Game');
@@ -43,6 +34,7 @@ export class Game extends Scene {
   preload() {
     this.load.spritesheet('archer', 'assets/archer.png', { frameWidth: 144, frameHeight: 144 });
     this.load.image('arrow', 'assets/arrow.png');
+    this.load.image('balloon', 'assets/balloon.png');
   }
 
 
@@ -58,8 +50,9 @@ export class Game extends Scene {
     this.scoreText.setText('Score: 0');
     this.arrowsText.setText('Arrows: 10');
 
-    // Create the archer sprite 
+
     this.archer = new Archer(this, 200, 500);
+    this.addBalloons();
 
     //this.archer.anims.play('idle');
 
@@ -104,7 +97,20 @@ export class Game extends Scene {
     this.archer.update();
   }
 
+  addBalloons() {
+    this.balloons = this.add.group({
+      classType: Balloon,
+      maxSize: 10,
+      runChildUpdate: true
+    });
 
+  this.balloons.createMultiple({ key: 'balloon', quantity: 7, setXY: { x: 100, y: 50, stepX: 0, stepY: 50 }   });
+
+   /* for (let i = 0; i < 5; i++) {
+      let balloon = this.balloons.get(300, i * 100 + 50);
+
+    }*/
+  }
 
  
   gameOver() {

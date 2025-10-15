@@ -4,7 +4,7 @@ export default class Arrow extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.setActive(false);
+    this.setActive(false).setVisible(false);
   }
 
   override update() {
