@@ -70,7 +70,6 @@ export class Game extends Scene {
   }
 
   hitBalloon(arrow: any, balloon: any) {
-    console.log('Balloon hit!');
       balloon.destroy();
   }
 
@@ -97,25 +96,27 @@ export class Game extends Scene {
 
   override update() {
     this.archer.update();
+    
+    if (this.balloons.children.size === 0) {
+      this.addBalloons();
+    }
   }
 
   addBalloons() {
-    this.balloons = this.add.group({
-      classType: Balloon,
-      maxSize: 10,
-      runChildUpdate: true
-    });
+    if (!this.balloons) {
+      this.balloons = this.add.group({
+        classType: Balloon,
+        maxSize: 10,
+        runChildUpdate: true
+      });
+    }
 
-  this.balloons.createMultiple({ key: 'balloon', quantity: 7, setXY: { x: 100, y: 50, stepX: 0, stepY: 50 }   });
+  this.balloons.createMultiple({ key: 'balloon', quantity: 7, setXY: { x: 0, y: 50, stepX: 0, stepY: 50 }   });
   
   this.balloons.children.entries.forEach(balloon => {
     (balloon as any).body.setCircle(20);
   });
 
-   /* for (let i = 0; i < 5; i++) {
-      let balloon = this.balloons.get(300, i * 100 + 50);
-
-    }*/
   }
 
  

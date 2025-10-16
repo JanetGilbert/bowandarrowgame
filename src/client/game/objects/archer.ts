@@ -23,18 +23,18 @@ export default class Archer extends Phaser.GameObjects.Sprite {
     if (!this.scene.anims.exists('walk_left')) {
       this.scene.anims.create({
         key: 'walk_left',
-        frames: this.scene.anims.generateFrameNumbers('archer', { start: 16, end: 31 } ),
+        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [23, 24, 25] }),
         frameRate: 8,
-        repeat: -1
+        yoyo: true
       });
     }
 
     if (!this.scene.anims.exists('walk_right')) {
       this.scene.anims.create({
         key: 'walk_right',
-        frames: this.scene.anims.generateFrameNumbers('archer', { start: 32, end: 47 } ),
+        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [38, 39, 40] }),
         frameRate: 8,
-        repeat: -1
+        yoyo: true
       });
     }
 
@@ -43,7 +43,7 @@ export default class Archer extends Phaser.GameObjects.Sprite {
         key: 'idle',
         frames: this.scene.anims.generateFrameNumbers('archer', { frames: [48, 49] }),
         frameRate: 8,
-        repeat: -1
+        repeat: -1,
       });
     }
 
@@ -75,12 +75,21 @@ export default class Archer extends Phaser.GameObjects.Sprite {
         
         // Keep archer within fixed portrait bounds
         const clampedX = Phaser.Math.Clamp(newX, 50, 350);
+        
+        // Play walking animation based on movement direction
+        if (clampedX < this.x) {
+          this.anims.play('walk_left', true);
+        } else if (clampedX > this.x) {
+          this.anims.play('walk_right', true);
+        }
+        
         this.x = clampedX;
       }
     });
     
     this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
       if (this.isDragging) {
+        this.anims.play('idle', true);
         this.isDragging = false;
         this.fireBow();
       }
