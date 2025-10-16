@@ -5,6 +5,7 @@ export default class Archer extends Phaser.GameObjects.Sprite {
   isDragging: boolean = false;
   dragStartX: number = 0;
   archerStartX: number = 0;
+  movedTime: number = 0;
 
   arrow: Arrow;
 
@@ -17,13 +18,14 @@ export default class Archer extends Phaser.GameObjects.Sprite {
     this.anims.play('idle');
     this.setInteractive();
     this.arrow = new Arrow(this.scene);
+    this.movedTime = this.scene.time.now;
   }
 
   createAnimations() {
     if (!this.scene.anims.exists('walk_left')) {
       this.scene.anims.create({
         key: 'walk_left',
-        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [23, 24, 25] }),
+        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [22, 23, 24] }),
         frameRate: 8,
         yoyo: true
       });
@@ -32,7 +34,7 @@ export default class Archer extends Phaser.GameObjects.Sprite {
     if (!this.scene.anims.exists('walk_right')) {
       this.scene.anims.create({
         key: 'walk_right',
-        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [38, 39, 40] }),
+        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [37, 38, 39] }),
         frameRate: 8,
         yoyo: true
       });
@@ -84,6 +86,7 @@ export default class Archer extends Phaser.GameObjects.Sprite {
         }
         
         this.x = clampedX;
+        this.movedTime = this.scene.time.now;
       }
     });
     
@@ -115,12 +118,14 @@ export default class Archer extends Phaser.GameObjects.Sprite {
   }
 
   override update() {
-    // Player-specific update logic
     this.handleMovement();
     this.arrow.update();
   }
 
   handleMovement() {
-    // Movement logic here (if any additional movement is needed)
+    if (this.isDragging && (this.scene.time.now - this.movedTime) > 200) {
+      this.anims.play('idle', true);
+   }
+
   }
 }
