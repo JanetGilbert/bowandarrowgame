@@ -3,6 +3,7 @@ export default class Arrow extends Phaser.Physics.Arcade.Sprite {
     super(scene, 100, 800, 'arrow');
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    this.body?.setSize(3, 20);
 
     this.setActive(false).setVisible(false);
   }

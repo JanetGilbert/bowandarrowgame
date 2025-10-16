@@ -52,10 +52,10 @@ export class Game extends Scene {
     this.arrowsText.setText('Arrows: 10');
 
 
-    this.archer = new Archer(this, 200, 500);
+    this.archer = new Archer(this, 200, 550);
     this.addBalloons();
     this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
-
+    this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
 
     //this.archer.anims.play('idle');
 
@@ -107,6 +107,10 @@ export class Game extends Scene {
     });
 
   this.balloons.createMultiple({ key: 'balloon', quantity: 7, setXY: { x: 100, y: 50, stepX: 0, stepY: 50 }   });
+  
+  this.balloons.children.entries.forEach(balloon => {
+    (balloon as any).body.setCircle(20);
+  });
 
    /* for (let i = 0; i < 5; i++) {
       let balloon = this.balloons.get(300, i * 100 + 50);
