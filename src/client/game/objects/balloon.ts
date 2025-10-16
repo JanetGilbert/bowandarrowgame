@@ -1,9 +1,13 @@
 export default class Balloon extends Phaser.Physics.Arcade.Sprite {
+  variance: number = 0.1;
+  oscillate: number = 0.002;
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'balloon');
+    this.variance = Phaser.Math.FloatBetween(0.03, 0.05);
+    this.oscillate = Phaser.Math.FloatBetween(0.001, 0.002);
     scene.add.existing(this);
     scene.physics.add.existing(this);
-   this.setVelocityX(50);
+    this.setVelocityX(Phaser.Math.FloatBetween(50, 55));
     this.setActive(false);
   }
 
@@ -14,9 +18,10 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
   handleMovement() {
     if (this.active) {
       if (this.x > this.scene.scale.width + 50) {
-        //this.setActive(false);
-        this.x = -50; // Reset position to the left side
+        this.x = -50; 
+
       }
+      this.y += Math.sin(this.scene.time.now * this.oscillate) * this.variance;
     }
   }
 }

@@ -70,6 +70,7 @@ export class Game extends Scene {
   }
 
   hitBalloon(arrow: any, balloon: any) {
+    console.log('Balloon hit!');
       balloon.destroy();
   }
 
@@ -78,12 +79,6 @@ export class Game extends Scene {
     this.scoreText = this.add.text(20, 20, 'Score: 0', {
       fontFamily: 'Arial',
       fontSize: '18px',
-      color: '#000000'
-    });
-    
-    this.highScoreText = this.add.text(20, 45, 'High Score: 0', {
-      fontFamily: 'Arial',
-      fontSize: '16px',
       color: '#000000'
     });
     
