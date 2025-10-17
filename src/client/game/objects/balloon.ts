@@ -27,6 +27,8 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
   }
 
   explode() {
+    this.scene.sound.play('pop');
+    
     this.scene.add.particles(this.x, this.y, 'balloon_particles', {
       quantity: 10, 
       lifespan: 200,

@@ -37,6 +37,7 @@ export class Game extends Scene {
     this.load.image('arrow', 'assets/arrow.png');
     this.load.image('balloon', 'assets/balloon.png');
     this.load.spritesheet('balloon_particles', 'assets/balloon_particles.png', { frameWidth: 16, frameHeight: 16});
+    this.load.audio('pop', 'assets/pop.wav');
   }
  
 
