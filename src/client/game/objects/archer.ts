@@ -4,7 +4,7 @@ enum ArcherState {
   Idle,
   MoveLeft,
   MoveRight,
-  DrawingBow,
+  BowDraw,
 }
 
 export default class Archer extends Phaser.GameObjects.Sprite {
@@ -14,6 +14,7 @@ export default class Archer extends Phaser.GameObjects.Sprite {
   archerStartX: number = 0;
   lastMovedTime: number = 0;
   currentState: ArcherState = ArcherState.Idle;
+
   arrow: Arrow;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -85,7 +86,11 @@ export default class Archer extends Phaser.GameObjects.Sprite {
       this.isDragging = true;
       this.dragStartX = pointer.x;
       this.archerStartX = this.x;
-      this.setArcherState(ArcherState.DrawingBow);
+      console.log("arrow active: " + this.arrow.active);
+      if (!this.arrow.active) {
+          this.setArcherState(ArcherState.BowDraw);
+      }
+
     });
     
     this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
@@ -148,7 +153,7 @@ export default class Archer extends Phaser.GameObjects.Sprite {
         case ArcherState.MoveRight:
           this.anims.play('walk_right', true);
           break;
-        case ArcherState.DrawingBow:
+        case ArcherState.BowDraw:
           if (oldState == ArcherState.Idle) {
             this.anims.play('draw', true);
           } else {
@@ -171,12 +176,16 @@ export default class Archer extends Phaser.GameObjects.Sprite {
 
   handleMovement() {
     if ((this.currentState==ArcherState.MoveLeft || this.currentState==ArcherState.MoveRight) && (this.scene.time.now - this.lastMovedTime) > 200) {
-      if(this.isDragging) {
-        this.setArcherState(ArcherState.DrawingBow);
+      if(this.isDragging && !this.arrow.active) {
+        this.setArcherState(ArcherState.BowDraw);
       }
       else {
         this.setArcherState(ArcherState.Idle);
       }
+    }
+
+    if (this.currentState == ArcherState.Idle && !this.arrow.active && this.isDragging) {
+      this.setArcherState(ArcherState.BowDraw);
     }
   }
 }
