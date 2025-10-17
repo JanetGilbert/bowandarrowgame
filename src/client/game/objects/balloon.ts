@@ -24,4 +24,20 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
       this.y += Math.sin(this.scene.time.now * this.oscillate) * this.variance;
     }
   }
+
+  explode() {
+    this.scene.add.particles(this.x, this.y, 'balloon_particles', {
+      quantity: 10, 
+      lifespan: 100,
+      scale: { start: 0.5, end: 1 },
+      alpha: { start: 1, end: 0 },
+      tint: 0xff0000,
+      speed: { min: 300, max: 500 },
+      emitting: false,
+      frame: Phaser.Math.Between(0, 3),
+      rotate: { start: Phaser.Math.Between(0, 180), end: 360 }
+    }).explode();
+    
+    this.destroy();
+  }
 }

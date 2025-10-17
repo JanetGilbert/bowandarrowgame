@@ -36,8 +36,9 @@ export class Game extends Scene {
     this.load.spritesheet('archer', 'assets/archer.png', { frameWidth: 144, frameHeight: 144 });
     this.load.image('arrow', 'assets/arrow.png');
     this.load.image('balloon', 'assets/balloon.png');
+    this.load.spritesheet('balloon_particles', 'assets/balloon_particles.png', { frameWidth: 16, frameHeight: 16});
   }
-
+ 
 
   create() {
     // Set up the game world
@@ -54,6 +55,8 @@ export class Game extends Scene {
 
     this.archer = new Archer(this, 200, 550);
     this.addBalloons();
+    
+
     this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
 
@@ -70,7 +73,8 @@ export class Game extends Scene {
   }
 
   hitBalloon(arrow: any, balloon: any) {
-      balloon.destroy();
+      balloon.explode();
+
   }
 
   createUI() {
