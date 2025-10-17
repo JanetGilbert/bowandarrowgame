@@ -8,6 +8,7 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.setVelocityX(Phaser.Math.FloatBetween(50, 55));
+    this.setTint(Phaser.Math.RND.pick([0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff]));
     this.setActive(false);
   }
 
@@ -28,10 +29,10 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
   explode() {
     this.scene.add.particles(this.x, this.y, 'balloon_particles', {
       quantity: 10, 
-      lifespan: 100,
+      lifespan: 200,
       scale: { start: 0.5, end: 1 },
       alpha: { start: 1, end: 0 },
-      tint: 0xff0000,
+      tint: this.tint,
       speed: { min: 300, max: 500 },
       emitting: false,
       frame: Phaser.Math.Between(0, 3),
