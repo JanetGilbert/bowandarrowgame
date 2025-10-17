@@ -1,12 +1,19 @@
 import Arrow from '../objects/arrow.js';
 
+enum ArcherState {
+  Idle,
+  MoveLeft,
+  MoveRight,
+  DrawingBow,
+}
+
 export default class Archer extends Phaser.GameObjects.Sprite {
 
   isDragging: boolean = false;
   dragStartX: number = 0;
   archerStartX: number = 0;
-  movedTime: number = 0;
-
+  lastMovedTime: number = 0;
+  currentState: ArcherState = ArcherState.Idle;
   arrow: Arrow;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -18,7 +25,7 @@ export default class Archer extends Phaser.GameObjects.Sprite {
     this.anims.play('idle');
     this.setInteractive();
     this.arrow = new Arrow(this.scene);
-    this.movedTime = this.scene.time.now;
+    this.lastMovedTime = this.scene.time.now;
   }
 
   createAnimations() {
@@ -27,7 +34,8 @@ export default class Archer extends Phaser.GameObjects.Sprite {
         key: 'walk_left',
         frames: this.scene.anims.generateFrameNumbers('archer', { frames: [22, 23, 24] }),
         frameRate: 8,
-        yoyo: true
+        yoyo: true,
+        repeat: -1,
       });
     }
 
@@ -36,14 +44,15 @@ export default class Archer extends Phaser.GameObjects.Sprite {
         key: 'walk_right',
         frames: this.scene.anims.generateFrameNumbers('archer', { frames: [37, 38, 39] }),
         frameRate: 8,
-        yoyo: true
+        yoyo: true,
+        repeat: -1,
       });
     }
 
     if (!this.scene.anims.exists('idle')) {
       this.scene.anims.create({
         key: 'idle',
-        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [48, 49] }),
+        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [50] }),
         frameRate: 8,
         repeat: -1,
       });
@@ -52,9 +61,18 @@ export default class Archer extends Phaser.GameObjects.Sprite {
     if (!this.scene.anims.exists('draw')) {
       this.scene.anims.create({
         key: 'draw',
-        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [63, 62, 61, 60] }),
+        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [59, 60, 61] }),
         frameRate: 8,
-        repeat: -1
+        repeat: 0
+      });
+    }
+
+    if (!this.scene.anims.exists('drawn')) {
+      this.scene.anims.create({
+        key: 'drawn',
+        frames: this.scene.anims.generateFrameNumbers('archer', { frames: [61] }),
+        frameRate: 8,
+        repeat: 0
       });
     }
   }
@@ -67,6 +85,7 @@ export default class Archer extends Phaser.GameObjects.Sprite {
       this.isDragging = true;
       this.dragStartX = pointer.x;
       this.archerStartX = this.x;
+      this.setArcherState(ArcherState.DrawingBow);
     });
     
     this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
@@ -79,22 +98,25 @@ export default class Archer extends Phaser.GameObjects.Sprite {
         const clampedX = Phaser.Math.Clamp(newX, 50, 350);
         
         // Play walking animation based on movement direction
-        if (clampedX < this.x) {
-          this.anims.play('walk_left', true);
-        } else if (clampedX > this.x) {
-          this.anims.play('walk_right', true);
+        const diffX = Math.abs(clampedX - this.x);
+        if (clampedX < this.x && diffX > 1) {
+          this.setArcherState(ArcherState.MoveLeft);
+        } else if (clampedX > this.x && diffX > 1) {
+          this.setArcherState(ArcherState.MoveRight);
         }
         
         this.x = clampedX;
-        this.movedTime = this.scene.time.now;
+        if (diffX > 1){
+          this.lastMovedTime = this.scene.time.now;
+        }
       }
     });
     
     this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
       if (this.isDragging) {
-        this.anims.play('idle', true);
         this.isDragging = false;
         this.fireBow();
+        this.setArcherState(ArcherState.Idle);
       }
     });
 
@@ -111,10 +133,35 @@ export default class Archer extends Phaser.GameObjects.Sprite {
     });
   }
 
-
+  setArcherState(newState: ArcherState) {
+    if (this.currentState !== newState) {
+      const oldState = this.currentState;
+      console.log('State change:', ArcherState[this.currentState], '->', ArcherState[newState]);
+      this.currentState = newState; 
+      switch (newState) {
+        case ArcherState.Idle:
+          this.anims.play('idle', true);
+          break;
+        case ArcherState.MoveLeft:
+          this.anims.play('walk_left', true);
+          break;
+        case ArcherState.MoveRight:
+          this.anims.play('walk_right', true);
+          break;
+        case ArcherState.DrawingBow:
+          if (oldState == ArcherState.Idle) {
+            this.anims.play('draw', true);
+          } else {
+            this.anims.play('drawn', true);
+          }
+          break;
+      }
+    }
+  }
 
   fireBow() {
     this.arrow.fireArrow(this.x, this.y - 20);
+
   }
 
   override update() {
@@ -123,9 +170,13 @@ export default class Archer extends Phaser.GameObjects.Sprite {
   }
 
   handleMovement() {
-    if (this.isDragging && (this.scene.time.now - this.movedTime) > 200) {
-      this.anims.play('idle', true);
-   }
-
+    if ((this.currentState==ArcherState.MoveLeft || this.currentState==ArcherState.MoveRight) && (this.scene.time.now - this.lastMovedTime) > 200) {
+      if(this.isDragging) {
+        this.setArcherState(ArcherState.DrawingBow);
+      }
+      else {
+        this.setArcherState(ArcherState.Idle);
+      }
+    }
   }
 }
