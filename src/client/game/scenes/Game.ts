@@ -30,7 +30,7 @@ export class Game extends Scene {
     // Reset game state when starting new game
     this.score = 0;
     this.arrowsRemaining = 10;
-    this.targetsRemaining = 30;
+    this.targetsRemaining = 25;
   }
 
   preload() {
@@ -50,9 +50,20 @@ export class Game extends Scene {
     // Set up the game world
     this.cameras.main.setBackgroundColor(0x90EE90); // Light green background
 
-
-    // Create UI
     this.createUI();
+
+    
+    this.floatScores = this.add.group({
+      classType: FloatScore,
+      runChildUpdate: true,
+      maxSize: 20
+    });
+
+    this.balloons = this.add.group({
+      classType: Balloon,
+      maxSize: 10,
+      runChildUpdate: true
+    });
 
     this.archer = new Archer(this, 200, 550);
     this.addBalloons();
@@ -62,14 +73,6 @@ export class Game extends Scene {
 
     this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
-
-    if (!this.floatScores) {
-      this.floatScores = this.add.group({
-        classType: FloatScore,
-        runChildUpdate: true,
-        maxSize: 20
-      });
-    }
 
   }
 
@@ -116,19 +119,13 @@ export class Game extends Scene {
   } 
 
   addBalloons() {
-    if (!this.balloons) {
-      this.balloons = this.add.group({
-        classType: Balloon,
-        maxSize: 10,
-        runChildUpdate: true
-      });
-    }
 
-  this.balloons.createMultiple({ key: 'balloon', quantity: 7, setXY: { x: 0, y: 50, stepX: 0, stepY: 50 }   });
-  
-  this.balloons.children.entries.forEach(balloon => {
-    (balloon as any).body.setCircle(20);
-  });
+
+    this.balloons.createMultiple({ key: 'balloon', quantity: 7, setXY: { x: 0, y: 50, stepX: 0, stepY: 50 }   });
+    
+    this.balloons.children.entries.forEach(balloon => {
+      (balloon as any).body.setCircle(20);
+    });
 
   }
 
