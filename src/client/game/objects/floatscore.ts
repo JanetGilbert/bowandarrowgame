@@ -5,27 +5,23 @@ export default class FloatScore extends Phaser.GameObjects.BitmapText {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     
-    // Set the origin to center the text
-    this.setOrigin(0.5);
-    
-    // Set initial velocity to float upward
+    this.setOrigin(0.5); // Set the origin to center the text
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityY(-100);
+    this.setTint(tint);
     
-    this.setTintFill(tint);
-  }
-
-  override update() {
-    this.handleMovement();
-  }
-
-
-  handleMovement() {
-    if (this.active) {
-      if (this.y < 0) {
+    // Start fade out animation
+    scene.tweens.add({
+      targets: this,
+      alpha: { from: 1, to: 0 },
+      duration: 500, 
+      ease: 'Linear',
+      onComplete: () => {
         this.setActive(false);
         this.destroy();
       }
-    }
+    });
   }
+
+
 }
