@@ -38,7 +38,8 @@ export class Game extends Scene {
     this.load.image('arrow', 'assets/arrow.png');
     this.load.image('balloon', 'assets/balloon.png');
     this.load.spritesheet('balloon_particles', 'assets/balloon_particles.png', { frameWidth: 16, frameHeight: 16});
-    this.load.audio('pop', 'assets/pop.wav');
+    this.load.audio('pop', 'assets/sound/pop.wav');
+    this.load.audio('music', 'assets/sound/cuddle_clouds.mp3');
     this.load.bitmapFont('moghul', 'assets/fonts/Moghul.png', 'assets/fonts/Moghul.xml');
     this.load.bitmapFont('moghul_white', 'assets/fonts/moghul_white.png', 'assets/fonts/moghul_white.xml');
     this.load.image('target', 'assets/target.png');
@@ -73,6 +74,10 @@ export class Game extends Scene {
 
     this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
+
+    // Play background music
+    const music = this.sound.add('music', { loop: true, volume: 0.5 });
+    music.play();
 
   }
 
