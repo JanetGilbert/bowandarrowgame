@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import * as Phaser from 'phaser';
 import Archer from '../objects/archer.js';
 import Balloon from '../objects/balloon.js';
+import FloatScore from '../objects/floatscore.js';
 
 export class Game extends Scene {
   // Game state
@@ -14,6 +15,7 @@ export class Game extends Scene {
   // Game objects
   archer: Archer;
   balloons: Phaser.GameObjects.Group;
+  floatScores: Phaser.GameObjects.Group;
   
   // UI elements
   scoreText: Phaser.GameObjects.BitmapText;
@@ -28,7 +30,7 @@ export class Game extends Scene {
     // Reset game state when starting new game
     this.score = 0;
     this.arrowsRemaining = 10;
-    this.targetsRemaining = 25;
+    this.targetsRemaining = 30;
   }
 
   preload() {
@@ -38,6 +40,7 @@ export class Game extends Scene {
     this.load.spritesheet('balloon_particles', 'assets/balloon_particles.png', { frameWidth: 16, frameHeight: 16});
     this.load.audio('pop', 'assets/pop.wav');
     this.load.bitmapFont('moghul', 'assets/fonts/Moghul.png', 'assets/fonts/Moghul.xml');
+    this.load.bitmapFont('moghul_white', 'assets/fonts/moghul_white.png', 'assets/fonts/moghul_white.xml');
     this.load.image('target', 'assets/target.png');
     //this.textures.get('chickenpie').setFilter(Phaser.Textures.FilterMode.LINEAR);
   }
@@ -50,11 +53,6 @@ export class Game extends Scene {
 
     // Create UI
     this.createUI();
-    
-    // Update UI with initial values
-    //this.scoreText.setText('Score: 0');
-    //this.arrowsText.setText('Arrows: 10');
-
 
     this.archer = new Archer(this, 200, 550);
     this.addBalloons();
@@ -65,44 +63,37 @@ export class Game extends Scene {
     this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
 
+    if (!this.floatScores) {
+      this.floatScores = this.add.group({
+        classType: FloatScore,
+        runChildUpdate: true,
+        maxSize: 20
+      });
+    }
+
   }
 
   hitBalloon(arrow: any, balloon: any) {
-      this.score += Balloon.score * arrow.multiplier;
-      console.log('Arrow multiplier:', arrow.multiplier, "Balloon score:", Balloon.score);
-      balloon.explode();
-
-      arrow.multiplier += 10;
-      this.refreshUI();
+    console.log('Balloon score: ' + Balloon.score + " arrow multiplier: " + arrow.multiplier);
+    const scoreToAdd = Balloon.score * arrow.multiplier;
+    this.floatScores.add(new FloatScore(this, balloon.x, balloon.y, scoreToAdd, balloon.tint));
+    this.score += scoreToAdd;
+    balloon.explode();
+    arrow.multiplier += 10;
+    this.targetsRemaining--;
+    this.refreshUI();
   }
 
   onArrowUsed() {
     this.arrowsRemaining--;
+
+    if (this.arrowsRemaining <= 0) {
+      this.gameOver();
+    }
     this.refreshUI();
   }
 
   createUI() {
-    // Score background
-   /*this.add.graphics()
-      .fillStyle(0xffffff)
-      .lineStyle(2, 0x000000)
-      .fillRoundedRect(15, 15, 90, 30, 8)
-      .strokeRoundedRect(15, 15, 90, 30, 8);*/
-
-    const fontStyle = {
-      fontFamily: 'Arial',
-      fontSize: '24px',
-      color: '#000000',
-      resolution: window.devicePixelRatio,
-      shadow: {
-                color: '#000000',
-                fill: true,
-                offsetX: 2,
-                offsetY: 2,
-                blur: 4
-            }
-    };
-    
     this.scoreText = this.add.bitmapText(20, 20, 'moghul', 'Score: ' + this.score, 24);
     this.add.image(235, 30, 'arrow');
     this.arrowsText = this.add.bitmapText(250, 20, 'moghul', this.arrowsRemaining.toString(), 24);

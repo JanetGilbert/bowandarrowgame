@@ -1,7 +1,7 @@
 export default class Balloon extends Phaser.Physics.Arcade.Sprite {
   private variance: number = 0.1;
   private oscillate: number = 0.002;
-  static readonly score = 10;
+  static readonly score = 1;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'balloon');
