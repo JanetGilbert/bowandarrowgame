@@ -59,6 +59,8 @@ export class Game extends Scene {
     this.archer = new Archer(this, 200, 550);
     this.addBalloons();
     
+    // Listen for arrow used event
+    this.events.on('arrowUsed', this.onArrowUsed, this);
 
     this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
@@ -66,9 +68,17 @@ export class Game extends Scene {
   }
 
   hitBalloon(arrow: any, balloon: any) {
+      this.score += Balloon.score * arrow.multiplier;
+      console.log('Arrow multiplier:', arrow.multiplier, "Balloon score:", Balloon.score);
       balloon.explode();
-      this.score += balloon.score * arrow.multiplier;
+
       arrow.multiplier += 10;
+      this.refreshUI();
+  }
+
+  onArrowUsed() {
+    this.arrowsRemaining--;
+    this.refreshUI();
   }
 
   createUI() {
@@ -94,10 +104,9 @@ export class Game extends Scene {
     };
     
     this.scoreText = this.add.bitmapText(20, 20, 'moghul', 'Score: ' + this.score, 24);
-
-    this.add.image(225, 30, 'target');
+    this.add.image(235, 30, 'arrow');
     this.arrowsText = this.add.bitmapText(250, 20, 'moghul', this.arrowsRemaining.toString(), 24);
-    this.add.image(325, 30, 'arrow');
+    this.add.image(315, 30, 'target');
     this.targetsText = this.add.bitmapText(340, 20, 'moghul', this.targetsRemaining.toString(), 24);
   }
 
@@ -108,6 +117,12 @@ export class Game extends Scene {
       this.addBalloons();
     }
   }
+
+  refreshUI() {
+    this.scoreText.setText('Score: ' + this.score);
+    this.arrowsText.setText(this.arrowsRemaining.toString());
+    this.targetsText.setText(this.targetsRemaining.toString());
+  } 
 
   addBalloons() {
     if (!this.balloons) {

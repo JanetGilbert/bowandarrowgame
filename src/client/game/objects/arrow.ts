@@ -28,6 +28,7 @@ export default class Arrow extends Phaser.Physics.Arcade.Sprite {
     if (this.active) {
       if (this.y < 0) {
         this.setActive(false);
+        this.scene.events.emit('arrowUsed');
       }
     }
   }
