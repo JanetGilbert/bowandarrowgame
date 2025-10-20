@@ -1,4 +1,6 @@
 export default class Arrow extends Phaser.Physics.Arcade.Sprite {
+  multiplier: number = 1;
+
   constructor(scene: Phaser.Scene) {
     super(scene, 100, 800, 'arrow');
     scene.add.existing(this);
@@ -18,6 +20,7 @@ export default class Arrow extends Phaser.Physics.Arcade.Sprite {
       this.setActive(true);
       this.setVisible(true);
       this.setVelocityY(-400);
+      this.multiplier = 1;
     }
   }
 

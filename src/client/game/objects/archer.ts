@@ -9,11 +9,11 @@ enum ArcherState {
 
 export default class Archer extends Phaser.GameObjects.Sprite {
 
-  isDragging: boolean = false;
-  dragStartX: number = 0;
-  archerStartX: number = 0;
-  lastMovedTime: number = 0;
-  currentState: ArcherState = ArcherState.Idle;
+  private isDragging: boolean = false;
+  private dragStartX: number = 0;
+  private archerStartX: number = 0;
+  private lastMovedTime: number = 0;
+  private currentState: ArcherState = ArcherState.Idle;
 
   arrow: Arrow;
 
