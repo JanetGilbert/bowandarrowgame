@@ -70,6 +70,7 @@ export class Game extends Scene {
     this.addBalloons();
     
     // Listen for arrow used event
+    this.events.off('arrowUsed');
     this.events.on('arrowUsed', this.onArrowUsed, this);
 
     this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
