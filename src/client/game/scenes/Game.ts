@@ -5,6 +5,7 @@ import Balloon from '../objects/balloon.js';
 import FloatScore from '../objects/floatscore.js';
 
 export class Game extends Scene {
+  static readonly DEBUGGING: boolean = false;
   // Game state
   targetsRemaining: number = 0;
   arrowsRemaining: number = 10;
@@ -27,24 +28,21 @@ export class Game extends Scene {
   init() {
     this.arrowsRemaining = 10;
     this.targetsRemaining = 25;
+
   }
 
   preload() {
-    this.load.spritesheet('archer', 'assets/archer.png', { frameWidth: 144, frameHeight: 144 });
-    this.load.image('arrow', 'assets/arrow.png');
-    this.load.image('balloon', 'assets/balloon.png');
-    this.load.spritesheet('balloon_particles', 'assets/balloon_particles.png', { frameWidth: 16, frameHeight: 16});
-    this.load.audio('pop', 'assets/sound/pop.wav');
-    this.load.audio('music', 'assets/sound/cuddle_clouds.mp3');
-    this.load.bitmapFont('moghul', 'assets/fonts/Moghul.png', 'assets/fonts/Moghul.xml');
-    this.load.bitmapFont('moghul_white', 'assets/fonts/moghul_white.png', 'assets/fonts/moghul_white.xml');
-    this.load.image('target', 'assets/target.png');
+
     //this.textures.get('chickenpie').setFilter(Phaser.Textures.FilterMode.LINEAR);
   }
  
 
   create() {
-    // Set up the game world
+    // Set up physics debug rendering
+    if (Game.DEBUGGING){
+      this.physics.world.createDebugGraphic();
+    }
+    
     this.cameras.main.setBackgroundColor(0x90EE90); // Light green background
 
     this.createUI();
@@ -135,10 +133,6 @@ export class Game extends Scene {
 
 
     this.balloons.createMultiple({ key: 'balloon', quantity: 7, setXY: { x: 0, y: 50, stepX: 0, stepY: 50 }   });
-    
-    this.balloons.children.entries.forEach(balloon => {
-      (balloon as any).body.setCircle(20);
-    });
 
   }
 

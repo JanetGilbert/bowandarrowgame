@@ -20,7 +20,7 @@ export default class Arrow extends Phaser.Physics.Arcade.Sprite {
       this.setPosition(x, y);
       this.setActive(true);
       this.setVisible(true);
-      this.setVelocityY(-400);
+      this.setVelocityY(-350);
       this.multiplier = Arrow.baseMultiplier;
     }
   }

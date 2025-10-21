@@ -11,6 +11,14 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     this.setVelocityX(Phaser.Math.FloatBetween(50, 55));
     this.setTint(Phaser.Math.RND.pick([0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff]));
+    
+    // Set smaller, centered circular body
+    if (this.body) {
+      this.body.setCircle(15); // Radius of 15 pixels
+      this.body.setOffset(this.width / 2 - 15, this.height / 2 - 15); // Center the circle
+      (this.body as Phaser.Physics.Arcade.Body).debugShowBody = true;
+    }
+    
     this.setActive(false);
   }
 
