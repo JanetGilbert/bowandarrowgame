@@ -6,9 +6,7 @@ import FloatScore from '../objects/floatscore.js';
 
 export class Game extends Scene {
   // Game state
-  score: number = 0;
   targetsRemaining: number = 0;
-  level: number = 1;
   arrowsRemaining: number = 10;
   highScore: number = 0;
   
@@ -27,8 +25,6 @@ export class Game extends Scene {
   }
 
   init() {
-    // Reset game state when starting new game
-    this.score = 0;
     this.arrowsRemaining = 10;
     this.targetsRemaining = 25;
   }
@@ -86,24 +82,35 @@ export class Game extends Scene {
     console.log('Balloon score: ' + Balloon.score + " arrow multiplier: " + arrow.multiplier);
     const scoreToAdd = Balloon.score * arrow.multiplier;
     this.floatScores.add(new FloatScore(this, balloon.x, balloon.y, scoreToAdd, balloon.tint));
-    this.score += scoreToAdd;
+    this.addScore(scoreToAdd);
     balloon.explode();
     arrow.multiplier += 10;
-    this.targetsRemaining--;
+    this.targetsRemaining = Math.max(0, this.targetsRemaining - 1);
     this.refreshUI();
+  }
+
+  private addScore(points: number) {
+    const score = this.registry.get('score') || 0;
+    this.registry.set('score', score + points);
+  }
+
+  private getScore(): number {
+    return this.registry.get('score') || 0;
   }
 
   onArrowUsed() {
     this.arrowsRemaining--;
 
-    if (this.arrowsRemaining <= 0) {
+    if (this.targetsRemaining <= 0) {
+      this.scene.start('LevelUp');
+    }else if (this.arrowsRemaining <= 0) {
       this.gameOver();
     }
     this.refreshUI();
   }
 
   createUI() {
-    this.scoreText = this.add.bitmapText(20, 20, 'moghul', 'Score: ' + this.score, 24);
+    this.scoreText = this.add.bitmapText(20, 20, 'moghul', 'Score: ' + this.getScore(), 24);
     this.add.image(235, 30, 'arrow');
     this.arrowsText = this.add.bitmapText(250, 20, 'moghul', this.arrowsRemaining.toString(), 24);
     this.add.image(315, 30, 'target');
@@ -119,7 +126,7 @@ export class Game extends Scene {
   }
 
   refreshUI() {
-    this.scoreText.setText('Score: ' + this.score);
+    this.scoreText.setText('Score: ' + this.getScore());
     this.arrowsText.setText(this.arrowsRemaining.toString());
     this.targetsText.setText(this.targetsRemaining.toString());
   } 
@@ -138,7 +145,7 @@ export class Game extends Scene {
  
   gameOver() {
     this.scene.start('GameOver', { 
-      score: this.score, 
+      score: this.getScore(), 
       highScore: this.highScore 
     });
   }
