@@ -1,8 +1,16 @@
 import { defineConfig } from 'vite';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   return {
+    resolve: {
+      alias: {
+        '@game': path.resolve(__dirname, './game'),
+        '@objects': path.resolve(__dirname, './game/objects'),
+        '@scenes': path.resolve(__dirname, './game/scenes'),
+      },
+    },
     build: {
       outDir: '../../dist/client',
       sourcemap: true,

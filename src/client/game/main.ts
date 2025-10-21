@@ -6,6 +6,7 @@ import { MainMenu } from './scenes/MainMenu';
 import * as Phaser from 'phaser';
 import { AUTO, Game } from 'phaser';
 import { Preloader } from './scenes/Preloader';
+import { BalloonLevel } from './scenes/levels/BalloonLevel';
 
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
@@ -31,7 +32,7 @@ const config: Phaser.Types.Core.GameConfig = {
       height: 600
     }
   },
-  scene: [Boot, Preloader, MainMenu, MainGame, LevelUp, GameOver],
+  scene: [Boot, Preloader, MainMenu, MainGame, LevelUp, GameOver, BalloonLevel],
 };
 
 const StartGame = (parent: string) => {

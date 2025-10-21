@@ -1,9 +1,7 @@
 import { Scene } from 'phaser';
 import * as Phaser from 'phaser';
 import Archer from '../objects/archer.js';
-import Balloon from '../objects/balloon.js';
 import FloatScore from '../objects/floatscore.js';
-
 export class Game extends Scene {
   static readonly DEBUGGING: boolean = false;
   // Game state
@@ -13,13 +11,12 @@ export class Game extends Scene {
   
   // Game objects
   archer: Archer;
-  balloons: Phaser.GameObjects.Group;
   floatScores: Phaser.GameObjects.Group;
   
   // UI elements
-  scoreText: Phaser.GameObjects.BitmapText;
-  targetsText: Phaser.GameObjects.BitmapText;
-  arrowsText: Phaser.GameObjects.BitmapText;
+  private scoreText: Phaser.GameObjects.BitmapText;
+  private targetsText: Phaser.GameObjects.BitmapText;
+  private arrowsText: Phaser.GameObjects.BitmapText;
 
   constructor() {
     super('Game');
@@ -33,7 +30,6 @@ export class Game extends Scene {
 
   preload() {
 
-    //this.textures.get('chickenpie').setFilter(Phaser.Textures.FilterMode.LINEAR);
   }
  
 
@@ -54,40 +50,27 @@ export class Game extends Scene {
       maxSize: 20
     });
 
-    this.balloons = this.add.group({
-      classType: Balloon,
-      maxSize: 10,
-      runChildUpdate: true
-    });
-
     this.archer = new Archer(this, 200, 550);
-    this.addBalloons();
     
-    // Listen for arrow used event
     this.events.off('arrowUsed');
     this.events.on('arrowUsed', this.onArrowUsed, this);
 
-    this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
+    //this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
 
     // Play background music
     const music = this.sound.add('music', { loop: true, volume: 0.5 });
     music.play();
 
+    // Set up level scene
+    const level = this.registry.get('level') || 1;
+    if (level === 1) {
+      this.scene.launch('BalloonLevel');
+    }
+
   }
 
-  hitBalloon(arrow: any, balloon: any) {
-    console.log('Balloon score: ' + Balloon.score + " arrow multiplier: " + arrow.multiplier);
-    const scoreToAdd = Balloon.score * arrow.multiplier;
-    this.floatScores.add(new FloatScore(this, balloon.x, balloon.y, scoreToAdd, balloon.tint));
-    this.addScore(scoreToAdd);
-    balloon.explode();
-    arrow.multiplier += 10;
-    this.targetsRemaining = Math.max(0, this.targetsRemaining - 1);
-    this.refreshUI();
-  }
-
-  private addScore(points: number) {
+  addScore(points: number) {
     const score = this.registry.get('score') || 0;
     this.registry.set('score', score + points);
   }
@@ -100,6 +83,7 @@ export class Game extends Scene {
     this.arrowsRemaining--;
 
     if (this.targetsRemaining <= 0) {
+      this.scene.stop('BalloonLevel');
       this.scene.start('LevelUp');
     }else if (this.arrowsRemaining <= 0) {
       this.gameOver();
@@ -117,10 +101,7 @@ export class Game extends Scene {
 
   override update() {
     this.archer.update();
-    
-    if (this.balloons.children.size === 0) {
-      this.addBalloons();
-    }
+
   }
 
   refreshUI() {
@@ -128,14 +109,6 @@ export class Game extends Scene {
     this.arrowsText.setText(this.arrowsRemaining.toString());
     this.targetsText.setText(this.targetsRemaining.toString());
   } 
-
-  addBalloons() {
-
-
-    this.balloons.createMultiple({ key: 'balloon', quantity: 7, setXY: { x: 0, y: 50, stepX: 0, stepY: 50 }   });
-
-  }
-
  
   gameOver() {
     this.scene.start('GameOver', { 

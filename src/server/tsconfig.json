@@ -10,7 +10,16 @@
 
     "outDir": "../../dist/types/server",
 
-    "tsBuildInfoFile": "../../dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "../../dist/tsconfig.tsbuildinfo",
+
+    "baseUrl": ".",
+
+    "paths": {
+      "@/*": ["src/*"],
+      "@game/*": ["src/client/game/*"],
+      "@objects/*": ["src/client/game/objects/*"],
+      "@scenes/*": ["src/client/game/scenes/*"]
+    }
   },
   // https://github.com/Microsoft/TypeScript/issues/25636
   "include": ["**/*", "**/*.json", "../../package.json"],
