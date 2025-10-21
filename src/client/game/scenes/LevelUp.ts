@@ -33,7 +33,7 @@ export class LevelUp extends Scene {
 
     // Restart instruction
     this.restartText = this.add
-      .text(0, 0, 'Click or Press SPACE for level ' + ((this.registry.get('level') || 1) + 1), {
+      .text(0, 0, 'Click or Press SPACE for level ' + ((this.registry.get('level') || 0) + 2), {
         fontFamily: 'Arial',
         fontSize: '24px',
         color: '#000000',
@@ -63,7 +63,7 @@ export class LevelUp extends Scene {
   }
 
   private nextLevel(): void {
-    const currentLevel = this.registry.get('level') || 1;
+    const currentLevel = this.registry.get('level') || 0;
     this.registry.set('level', currentLevel + 1);
     this.scene.start('Game');
   }

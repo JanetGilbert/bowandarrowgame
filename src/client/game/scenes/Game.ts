@@ -1,9 +1,13 @@
 import { Scene } from 'phaser';
 import * as Phaser from 'phaser';
-import Archer from '../objects/archer.js';
-import FloatScore from '../objects/floatscore.js';
+import Archer from '@objects/archer.js';
+import FloatScore from '@objects/floatscore.js';
+import GameLevels from '@game/utility/constants.js';
+
 export class Game extends Scene {
   static readonly DEBUGGING: boolean = false;
+
+
   // Game state
   targetsRemaining: number = 0;
   arrowsRemaining: number = 10;
@@ -63,8 +67,10 @@ export class Game extends Scene {
     music.play();
 
     // Set up level scene
-    const level = this.registry.get('level') || 1;
-    if (level === 1) {
+    const level = this.registry.get('level') || 0;
+
+    const [levelType, phase] = GameLevels.getLevelDefinition(level);
+    if (levelType === 'BalloonLevel') {
       this.scene.launch('BalloonLevel');
     }
 
