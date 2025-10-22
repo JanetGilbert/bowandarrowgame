@@ -5,12 +5,12 @@ import FloatScore from '@objects/floatscore.js';
 import GameLevels from '@game/utility/constants.js';
 
 export class Game extends Scene {
-  static readonly DEBUGGING: boolean = true;
+  static readonly DEBUGGING: boolean = false;
 
 
   // Game state
-  targetsRemaining: number = 0;
-  arrowsRemaining: number = 10;
+  targetsRemaining: number;
+  arrowsRemaining: number;
   highScore: number = 0;
   
   // Game objects
@@ -27,8 +27,7 @@ export class Game extends Scene {
   }
 
   init() {
-    this.arrowsRemaining = 10;
-    this.targetsRemaining = 25;
+   
 
   }
 
@@ -38,15 +37,8 @@ export class Game extends Scene {
  
 
   create() {
-    // Set up physics debug rendering
-    if (Game.DEBUGGING){
-      this.physics.world.createDebugGraphic();
-    }
-    
+
     this.cameras.main.setBackgroundColor(0x90EE90); // Light green background
-
-    this.createUI();
-
     
     this.floatScores = this.add.group({
       classType: FloatScore,
@@ -59,21 +51,23 @@ export class Game extends Scene {
     this.events.off('arrowUsed');
     this.events.on('arrowUsed', this.onArrowUsed, this);
 
-    //this.physics.add.overlap(this.archer.arrow, this.balloons, this.hitBalloon, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
 
     // Play background music
     const music = this.sound.add('music', { loop: true, volume: 0.5 });
     music.play();
 
-    // Set up level scene
+    // Set up level 
     const level = this.registry.get('level') || 0;
-
-    const [levelType, phase] = GameLevels.getLevelDefinition(level);
+    const [levelType, phase, arrows, targets] = GameLevels.getLevelDefinition(level);
     console.log(`Starting level: ${levelType}, phase: ${phase}`);
     this.scene.launch(levelType, { phase: phase });
     
-
+    // UI
+    this.arrowsRemaining = arrows;
+    this.targetsRemaining = targets;
+    
+    this.createUI();
   }
 
   addScore(points: number) {

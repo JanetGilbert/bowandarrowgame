@@ -23,7 +23,11 @@ export class BalloonLevel extends Scene {
  
 
   create() {
-    // Get reference to Game scene
+    if (Game.DEBUGGING){
+      this.physics.world.createDebugGraphic();
+    }
+    
+
     this.gameScene = this.scene.get('Game') as Game;
     
     this.balloons = this.add.group({

@@ -23,7 +23,10 @@ export class BubbleLevel extends Scene {
  
 
   create() {
-    // Get reference to Game scene
+    if (Game.DEBUGGING){
+      this.physics.world.createDebugGraphic();
+    }
+    
     this.gameScene = this.scene.get('Game') as Game;
     
     this.bubbles = this.add.group({
@@ -55,7 +58,7 @@ export class BubbleLevel extends Scene {
 
     if (this.phase === 0){
       if (this.bubbles.children.size === 0) {
-        this.addBubbles();
+       // this.addBubbles();
       }
     }
    

@@ -13,15 +13,20 @@ export default class Bubble extends Phaser.Physics.Arcade.Sprite {
     this.setVelocityY(Phaser.Math.FloatBetween(-20, -25));
     this.setTint(Phaser.Math.Between(0x000000, 0xffffff));
     
+    // Scale randomly between half and full size
+    const scale = Phaser.Math.FloatBetween(0.5, 1.0);
+    this.setScale(scale);
+    
     if (this.body) {
-      const radius = 20;
+      const radius = 25;
       this.body.setCircle(radius);
-      this.body.setOffset(this.width / 2 - radius, this.height / 2 - radius);
+      //this.body.setOffset((this.width - radius * 2) / 2, (this.height - radius * 2) / 2);
       (this.body as Phaser.Physics.Arcade.Body).debugShowBody = true;
     }
     
     this.centerX = x;
     this.setActive(false);
+
 
     this.createAnimations();
   }

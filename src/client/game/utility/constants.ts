@@ -2,14 +2,14 @@ export default class GameLevels {
 
   // Level structure
   private static readonly LEVELS: Array<any> = [
-    { type: 'BalloonLevel', phase: 0}, // 0
-    { type: 'BalloonLevel', phase: 1}, // 1
-    { type: 'BubbleLevel', phase: 0}, // 2
+    { type: 'BalloonLevel', phase: 0, arrows: 10, targets: 25}, // 0
+    { type: 'BalloonLevel', phase: 1, arrows: 10, targets: 20}, // 1
+    { type: 'BubbleLevel', phase: 0, arrows: 15, targets: 30}, // 2
   ];
 
-  
-  static getLevelDefinition(levelNum: number): [levelType: string, phase: number] {
+
+  static getLevelDefinition(levelNum: number): [levelType: string, phase: number, arrows: number, targets: number] {
     const wrappedLevel = this.LEVELS[levelNum % this.LEVELS.length];
-    return [wrappedLevel.type, wrappedLevel.phase];
+    return [wrappedLevel.type, wrappedLevel.phase, wrappedLevel.arrows, wrappedLevel.targets];
   }
 }
