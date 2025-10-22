@@ -37,6 +37,7 @@ export class Preloader extends Scene {
     this.load.bitmapFont('moghul', 'fonts/Moghul.png', 'fonts/Moghul.xml');
     this.load.bitmapFont('moghul_white', 'fonts/moghul_white.png', 'fonts/moghul_white.xml');
     this.load.image('target', 'target.png');
+    this.load.spritesheet('bubble', 'bubble.png', { frameWidth: 50, frameHeight: 50 });
   }
 
   create() {

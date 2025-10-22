@@ -68,7 +68,6 @@ export class BalloonLevel extends Scene {
 
 
   addBalloons() {
-    console.log("phase" +this.phase);
     if (this.phase === 0){
       this.balloons.createMultiple({ key: 'balloon', quantity: 7, setXY: { x: 0, y: 50, stepX: 0, stepY: 50 }   });
     }
@@ -80,7 +79,6 @@ export class BalloonLevel extends Scene {
         newBalloon.setVelocityX(Phaser.Math.FloatBetween(40, 60));
         const overlapping = this.physics.overlap(newBalloon, this.balloons);
         if (overlapping) {
-          console.log("overlap detected");
           newBalloon.destroy(); // Remove and try again
           i--; // Decrement i to retry this iteration
         }

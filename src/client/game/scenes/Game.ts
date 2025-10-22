@@ -5,7 +5,7 @@ import FloatScore from '@objects/floatscore.js';
 import GameLevels from '@game/utility/constants.js';
 
 export class Game extends Scene {
-  static readonly DEBUGGING: boolean = false;
+  static readonly DEBUGGING: boolean = true;
 
 
   // Game state
