@@ -70,9 +70,9 @@ export class Game extends Scene {
     const level = this.registry.get('level') || 0;
 
     const [levelType, phase] = GameLevels.getLevelDefinition(level);
-    if (levelType === 'BalloonLevel') {
-      this.scene.launch('BalloonLevel');
-    }
+    console.log(`Starting level: ${levelType}, phase: ${phase}`);
+    this.scene.launch(levelType, { phase: phase });
+    
 
   }
 
