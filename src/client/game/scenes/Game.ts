@@ -83,7 +83,7 @@ export class Game extends Scene {
     this.arrowsRemaining--;
 
     if (this.targetsRemaining <= 0) {
-      this.scene.stop('BalloonLevel');
+      this.removeScenes();
       this.scene.start('LevelUp');
     }else if (this.arrowsRemaining <= 0) {
       this.gameOver();
@@ -111,9 +111,15 @@ export class Game extends Scene {
   } 
  
   gameOver() {
+    this.removeScenes();
     this.scene.start('GameOver', { 
       score: this.getScore(), 
       highScore: this.highScore 
     });
+  }
+
+  removeScenes() {
+    this.scene.stop('BalloonLevel');
+    this.scene.stop('BubbleLevel');
   }
 }

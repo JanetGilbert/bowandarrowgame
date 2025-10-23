@@ -71,7 +71,7 @@ export class BubbleLevel extends Scene {
     else {
       // Add bubbles periodically
       this.time.addEvent({
-        delay: Phaser.Math.Between(250, 1000), // every 1-3 seconds
+        delay: Phaser.Math.Between(250, 750), 
         callback: () => {
           if (this.bubbles.children.size < this.bubbles.maxSize) {
             const newBubble =  this.addRandomBubble();
@@ -82,7 +82,7 @@ export class BubbleLevel extends Scene {
                 alpha: 1,
                 duration: 1000,
                 ease: 'Power1'
-              }); // chain fade out 2-3 seconds later
+              }); // chain fade out
               this.time.delayedCall(Phaser.Math.Between(2000, 3000), () => {
                 this.tweens.add({
                   targets: newBubble,

@@ -33,6 +33,7 @@ export class Preloader extends Scene {
     this.load.image('balloon', 'balloon.png');
     this.load.spritesheet('balloon_particles', 'balloon_particles.png', { frameWidth: 16, frameHeight: 16});
     this.load.audio('pop', 'sound/pop.wav');
+    this.load.audio('pop2', 'sound/pop2.wav');
     this.load.audio('music', 'sound/cuddle_clouds.mp3');
     this.load.bitmapFont('moghul', 'fonts/Moghul.png', 'fonts/Moghul.xml');
     this.load.bitmapFont('moghul_white', 'fonts/moghul_white.png', 'fonts/moghul_white.xml');
