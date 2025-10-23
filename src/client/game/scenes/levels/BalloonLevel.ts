@@ -106,4 +106,10 @@ export class BalloonLevel extends Scene {
     } while (overlapping && tries < 10);
   }
 
+  shutdown() {
+    // Clean up balloon group when leaving the scene
+    if (this.balloons) {
+      this.balloons.clear(true, true);
+    }
+  }
 }

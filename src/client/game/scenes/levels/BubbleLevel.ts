@@ -56,11 +56,6 @@ export class BubbleLevel extends Scene {
   
   override update() {
 
-    if (this.phase === 0){
-      if (this.bubbles.children.size === 0) {
-       // this.addBubbles();
-      }
-    }
    
   }
 
@@ -70,17 +65,69 @@ export class BubbleLevel extends Scene {
 
     if (this.phase === 0){
       for (let i = 0; i < this.bubbles.maxSize; i++) {
-        const x = Phaser.Math.Between(0, this.cameras.main.width);
-        const y = Phaser.Math.Between(50, 400);
-        const newBubble = this.bubbles.create(x, y, 'bubble');
-        newBubble.setVelocityX(Phaser.Math.FloatBetween(40, 60));
-        const overlapping = this.physics.overlap(newBubble, this.bubbles);
-        if (overlapping) {
-          newBubble.destroy(); // Remove and try again
-          i--; // Decrement i to retry this iteration
-        }
+        this.addRandomBubble();
       }
     }
+    else {
+      // Add bubbles periodically
+      this.time.addEvent({
+        delay: Phaser.Math.Between(250, 1000), // every 1-3 seconds
+        callback: () => {
+          if (this.bubbles.children.size < this.bubbles.maxSize) {
+            const newBubble =  this.addRandomBubble();
+            if (newBubble) { // fade in
+              newBubble.setAlpha(0);
+              this.tweens.add({
+                targets: newBubble,
+                alpha: 1,
+                duration: 1000,
+                ease: 'Power1'
+              }); // chain fade out 2-3 seconds later
+              this.time.delayedCall(Phaser.Math.Between(2000, 3000), () => {
+                this.tweens.add({
+                  targets: newBubble,
+                  alpha: 0,
+                  duration: 1000,
+                  ease: 'Power1',
+                  onComplete: () => {
+                    newBubble.destroy();
+                  }
+                });
+              });
+            }
+          }
+        },
+        callbackScope: this,
+        loop: true
+      });
+    }
+
   }
 
+  addRandomBubble() : Bubble | null {
+    var overlapping = true;
+
+    while (overlapping) {
+      const x = Phaser.Math.Between(0, this.cameras.main.width);
+      const y = Phaser.Math.Between(50, 400);
+      const newBubble = this.bubbles.create(x, y, 'bubble');
+      newBubble.setVelocityX(Phaser.Math.FloatBetween(40, 60));
+      overlapping = this.physics.overlap(newBubble, this.bubbles);
+      if (overlapping) {
+        newBubble.destroy(); // Remove and try again
+      }
+      else{
+        return newBubble;
+      }
+    }
+    return null;
+
+  }
+
+  shutdown() {
+    // Clean up bubble group when leaving the scene
+    if (this.bubbles) {
+      this.bubbles.clear(true, true);
+    }
+  }
 }

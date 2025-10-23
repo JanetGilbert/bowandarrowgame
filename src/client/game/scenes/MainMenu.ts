@@ -22,10 +22,21 @@ export class MainMenu extends Scene {
     this.title = null;
     this.instructions = null;
     this.clickToStart = null;
+
+    // Stop and remove all level scenes to clean up memory
+    if (this.scene.isActive('BalloonLevel')) {
+      this.scene.stop('BalloonLevel');
+    }
+    if (this.scene.isActive('BubbleLevel')) {
+      this.scene.stop('BubbleLevel');
+    }
+    if (this.scene.isActive('Game')) {
+      this.scene.stop('Game');
+    }
   }
 
   create() {
-    this.registry.set('level', 2);
+    this.registry.set('level', 3);
     this.refreshLayout();
 
     // Re-calculate positions whenever the game canvas is resized (e.g. orientation change).
