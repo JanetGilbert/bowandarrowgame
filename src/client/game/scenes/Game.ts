@@ -6,7 +6,7 @@ import GameLevels from '@game/utility/constants.js';
 
 export class Game extends Scene {
   static readonly DEBUGGING: boolean = false;
-
+  static readonly CHEAT: boolean = true;
 
   // Game state
   targetsRemaining: number;
@@ -68,6 +68,14 @@ export class Game extends Scene {
     this.targetsRemaining = targets;
     
     this.createUI();
+    
+    // Cheat key for level up
+    if (Game.CHEAT) {
+      this.input.keyboard?.on('keydown-ZERO', () => {
+        this.removeScenes();
+        this.scene.start('LevelUp');
+      });
+    }
   }
 
   addScore(points: number) {
