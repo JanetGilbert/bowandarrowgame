@@ -1,11 +1,27 @@
+import { BirdLevel } from "@game/scenes/levels/BirdLevel";
+
 export default class Bird extends Phaser.Physics.Arcade.Sprite {
   static readonly score = 3;
+  private centerX: number;
+  private centerY: number;
+  private radius: number;
+  private circleAngle: number;
+  private angularSpeed: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'bird');
     scene.add.existing(this);
     scene.physics.add.existing(this);
    
+    // Initialize circular movement properties
+    if ((this.scene as BirdLevel).phase == 1) {
+      this.centerX = x;
+      this.centerY = y;
+      this.radius = Phaser.Math.Between(50, 150);
+      this.circleAngle = Phaser.Math.FloatBetween(0, Math.PI * 2);
+      this.angularSpeed = Phaser.Math.FloatBetween(0.001, 0.003);
+    }
+
     this.createAnimations(); 
 
     // Play animation 
@@ -48,8 +64,27 @@ export default class Bird extends Phaser.Physics.Arcade.Sprite {
   }
 
   handleMovement() {
-    if (this.active && this.body) {
-      this.scene.physics.world.wrap(this, 32);
+    const phase = (this.scene as BirdLevel).phase;
+    if (phase== 0) {
+      // wrap using arcade physics wrap
+      this.scene.physics.world.wrap(this, 25);
+    }
+    if (phase == 1) {
+      // Update circle angle
+      this.circleAngle += this.angularSpeed;
+      
+      // Calculate new position in circular path
+      const newX = this.centerX + Math.cos(this.circleAngle) * this.radius;
+      const newY = this.centerY + Math.sin(this.circleAngle) * this.radius;
+      
+      this.setPosition(newX, newY);
+      
+      // Calculate movement direction and face that way
+      const velocityX = -Math.sin(this.circleAngle) * this.angularSpeed;
+      const velocityY = Math.cos(this.circleAngle) * this.angularSpeed;
+      
+      // Set rotation to face movement direction
+      this.setRotation(Math.atan2(velocityY, velocityX));
     }
   }
 

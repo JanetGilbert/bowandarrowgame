@@ -7,7 +7,7 @@ import FloatScore from '@objects/floatscore.js';
 export class BirdLevel extends Scene {
   private birds: Phaser.GameObjects.Group;
   private gameScene: Game;
-  private phase: number;
+  public phase: number;
 
   constructor() {
     super('BirdLevel');
@@ -92,23 +92,26 @@ export class BirdLevel extends Scene {
 
       }
     }
+    else{ // set birds to wheel arround in randomly sized circles
+      for (let i = 0; i < 20; i++) {
+        console.log('Adding bird in phase 1 ', i);
+        const x = Phaser.Math.Between(0, this.cameras.main.width);
+        const y = Phaser.Math.Between(50, 400);
+        const newBird = this.birds.create(x, y, 'bird');
+        newBird.setVelocityX(Phaser.Math.FloatBetween(40, 60));
+        newBird.setAngularVelocity(Phaser.Math.FloatBetween(-100, 100));
+
+        // Check for overlap with existing birds
+        const overlapping = this.physics.overlap(newBird, this.birds);
+        if (overlapping) {
+          newBird.destroy(); // Remove and try again
+          i--; // Decrement i to retry this iteration
+        }
+      }
+    }
   }
 
-  addRandomBalloon() {
-    var overlapping = true;
-    var tries = 0;
-    do{
-      const x = Phaser.Math.Between(-50, 0);
-      const y = Phaser.Math.Between(50, 400);
-      const newBird = this.birds.create(x, y, 'bird');
-      newBird.setVelocityX(Phaser.Math.FloatBetween(40, 60));
-      overlapping = this.physics.overlap(newBird, this.birds);
-      if (overlapping) {
-        newBird.destroy(); // Remove and try again
-        tries++;
-      }
-    } while (overlapping && tries < 10);
-  }
+  
 
   shutdown() {
     // Clean up bird group when leaving the scene
