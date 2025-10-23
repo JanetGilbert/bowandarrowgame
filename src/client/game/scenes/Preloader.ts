@@ -23,22 +23,26 @@ export class Preloader extends Scene {
   }
 
   preload() {
-    //  Load the assets for the game - Replace with your own assets
     this.load.setPath('assets');
 
+    // Images and spritesheets
     this.load.image('logo', 'logo.png');
-
     this.load.spritesheet('archer', 'archer.png', { frameWidth: 144, frameHeight: 144 });
     this.load.image('arrow', 'arrow.png');
     this.load.image('balloon', 'balloon.png');
-    this.load.spritesheet('balloon_particles', 'balloon_particles.png', { frameWidth: 16, frameHeight: 16});
-    this.load.audio('pop', 'sound/pop.wav');
-    this.load.audio('pop2', 'sound/pop2.wav');
-    this.load.audio('music', 'sound/cuddle_clouds.mp3');
+    this.load.spritesheet('balloon_particles', 'balloon_particles.png', { frameWidth: 16, frameHeight: 16});;
     this.load.bitmapFont('moghul', 'fonts/Moghul.png', 'fonts/Moghul.xml');
     this.load.bitmapFont('moghul_white', 'fonts/moghul_white.png', 'fonts/moghul_white.xml');
     this.load.image('target', 'target.png');
     this.load.spritesheet('bubble', 'bubble.png', { frameWidth: 50, frameHeight: 50 });
+    this.load.spritesheet('bird', 'bird.png', { frameWidth: 50, frameHeight: 50 });
+    this.load.spritesheet('paper_particles', 'paper_particles.png', { frameWidth: 16, frameHeight: 16 });
+    
+    // Sounds
+    this.load.audio('pop', 'sound/pop.wav');
+    this.load.audio('pop2', 'sound/pop2.wav');
+    this.load.audio('rustle', 'sound/rustle.wav');
+    this.load.audio('music', 'sound/cuddle_clouds.mp3')
   }
 
   create() {

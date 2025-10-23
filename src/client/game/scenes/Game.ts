@@ -121,5 +121,6 @@ export class Game extends Scene {
   removeScenes() {
     this.scene.stop('BalloonLevel');
     this.scene.stop('BubbleLevel');
+    this.scene.stop('BirdLevel');
   }
 }

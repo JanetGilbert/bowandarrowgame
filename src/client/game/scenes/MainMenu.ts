@@ -27,7 +27,7 @@ export class MainMenu extends Scene {
   }
 
   create() {
-    this.registry.set('level', 0);
+    this.registry.set('level', 4);
     this.refreshLayout();
 
     // Re-calculate positions whenever the game canvas is resized (e.g. orientation change).
