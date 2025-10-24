@@ -40,9 +40,6 @@ export default class Bird extends Phaser.Physics.Arcade.Sprite {
       (this.body as Phaser.Physics.Arcade.Body).debugShowBody = true;
     }
     
-
-
-    this.setActive(false);
   }
 
   

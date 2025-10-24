@@ -25,8 +25,6 @@ export default class Bubble extends Phaser.Physics.Arcade.Sprite {
     }
     
     this.centerX = x;
-    this.setActive(false);
-
 
     this.createAnimations();
   }

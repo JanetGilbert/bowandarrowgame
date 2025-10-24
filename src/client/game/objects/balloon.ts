@@ -18,8 +18,6 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
       this.body.setOffset(this.width / 2 - 15, this.height / 2 - 15); // Center the circle
       (this.body as Phaser.Physics.Arcade.Body).debugShowBody = true;
     }
-    
-    this.setActive(false);
   }
 
   override update() {

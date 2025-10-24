@@ -44,6 +44,7 @@ export class Preloader extends Scene {
     this.load.audio('pop2', 'sound/pop2.wav');
     this.load.audio('rustle', 'sound/rustle.wav');
     this.load.audio('music', 'sound/cuddle_clouds.mp3')
+    this.load.audio('tennis', 'sound/tennis.wav')
   }
 
   create() {
