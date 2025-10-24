@@ -7,7 +7,8 @@ export default class GameLevels {
     { type: 'BubbleLevel', phase: 0, arrows: 15, targets: 30}, // 2
     { type: 'BubbleLevel', phase: 1, arrows: 15, targets: 20}, // 3
     { type: 'BirdLevel', phase: 0, arrows: 8, targets: 25}, // 4
-    { type: 'BirdLevel', phase: 1, arrows: 8, targets: 15}, // 5
+    { type: 'BirdLevel', phase: 1, arrows: 8, targets: 10}, // 5
+    { type: 'BallLevel', phase: 0, arrows: 12, targets: 15}, // 6
   ];
 
 

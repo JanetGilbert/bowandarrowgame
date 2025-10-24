@@ -51,7 +51,6 @@ export default class Bubble extends Phaser.Physics.Arcade.Sprite {
     this.play('bubble_pop');
     if (this.body) {
       this.body.enable = false;
-      console.log('Bubble body removed from physics world');
     }
     this.on('animationcomplete', () => {
       this.destroy();
