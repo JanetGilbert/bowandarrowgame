@@ -109,6 +109,7 @@ export class SnowflakeLevel extends Scene {
   }
 
   shutdown() {
+    console.log('Shutting down SnowflakeLevel');
     // Clean up snowflake group when leaving the scene
     if (this.snowflakes) {
       this.snowflakes.clear(true, true);
