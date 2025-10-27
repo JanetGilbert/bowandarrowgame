@@ -31,12 +31,19 @@ export class SnowflakeLevel extends Scene {
     
     this.snowflakes = this.add.group({
       classType: Snowflake,
-      maxSize: 30,
+      maxSize: 40,
       runChildUpdate: true
     });
 
     
     this.addSnowflakes();
+
+    this.time.addEvent({
+      delay: Phaser.Math.Between(100, 400),
+      callback: this.addRandomSnowflake,
+      callbackScope: this,
+      loop: true
+    });
 
     this.physics.add.overlap(this.gameScene.archer.arrow, this.snowflakes, this.hitSnowflake, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
@@ -54,9 +61,14 @@ export class SnowflakeLevel extends Scene {
   }
 
   
-  override update() {
-
-   
+  override update() 
+  {
+    // Destroy snowflakes that go off the bottom of the screen
+    this.snowflakes.children.entries.forEach((snowflake: any) => {
+      if (snowflake.active && snowflake.y > this.cameras.main.height + 50) {
+        snowflake.destroy();
+      }
+    });
   }
 
 
@@ -65,22 +77,26 @@ export class SnowflakeLevel extends Scene {
 
     if (this.phase === 0){
       for (let i = 0; i < this.snowflakes.maxSize; i++) {
-        this.addRandomSnowflake();
+        const y = Phaser.Math.Between(50, 400);
+        this.addRandomSnowflake(y);
       }
     }
     
 
   }
 
-  addRandomSnowflake() : Snowflake | null {
+  addRandomSnowflake(y: number) : Snowflake | null {
     var overlapping = true;
+    var tries = 0;
 
-    while (overlapping) {
-      const x = Phaser.Math.Between(0, this.cameras.main.width);
-      const y = Phaser.Math.Between(50, 400);
+    while (overlapping && tries < 10  ) {
+      const x = Phaser.Math.Between(0, this.cameras.main.width);  
       const newSnowflake = this.snowflakes.create(x, y, 'snowflake');
-      newSnowflake.setVelocityX(Phaser.Math.FloatBetween(40, 60));
+      if (newSnowflake==null){
+        return null;
+      }
       overlapping = this.physics.overlap(newSnowflake, this.snowflakes);
+      tries++;
       if (overlapping) {
         newSnowflake.destroy(); // Remove and try again
       }

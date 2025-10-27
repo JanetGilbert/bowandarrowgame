@@ -5,7 +5,8 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, 'snowflake');
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setVelocityY(Phaser.Math.FloatBetween(-20, -25));
+    this.setVelocityX(Phaser.Math.FloatBetween(-20, 20));
+    this.setVelocityY(Phaser.Math.FloatBetween(40, 80));
 
     // Scale randomly between half and full size
     const scale = Phaser.Math.FloatBetween(0.5, 1.0);
@@ -25,11 +26,7 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
   }
 
   handleMovement() {
-    if (this.active) {
-      if (this.y < -this.height) {
-        this.y = this.scene.scale.height + this.height;
-      }
-    }
+    
   }
 
   explode() {
@@ -38,15 +35,15 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
 
     this.scene.add.particles(this.x, this.y, 'snowflake_particles', {
       quantity: 20, 
-      lifespan: 100,
+      lifespan: 1000,
+      scale: { min: 1, max: 2 },
       alpha: { start: 1, end: 0 },
-      tint: this.tint,
-      speed: { min: 600, max: 700 },
+      tint: 0xffffff, // White tint for snowflake particles
+      speed: { min: 100, max: 200 },
+      gravityY: 200,
       emitting: false,
-      frame: [0, 1, 2, 3, 4, 5],
       anim: 'snowflake_pop',
-      rotate: { start: 0, end: 3600 }
-    });
+    }).explode();
 
     this.destroy();
     

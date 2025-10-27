@@ -106,8 +106,10 @@ export class BubbleLevel extends Scene {
 
   addRandomBubble() : Bubble | null {
     var overlapping = true;
+    var tries = 0;
 
-    while (overlapping) {
+    while (overlapping && tries < 10  ) {
+      tries++;
       const x = Phaser.Math.Between(0, this.cameras.main.width);
       const y = Phaser.Math.Between(50, 400);
       const newBubble = this.bubbles.create(x, y, 'bubble');
