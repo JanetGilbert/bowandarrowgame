@@ -38,6 +38,9 @@ export class Preloader extends Scene {
     this.load.spritesheet('bird', 'bird.png', { frameWidth: 50, frameHeight: 50 });
     this.load.spritesheet('paper_particles', 'paper_particles.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('balls', 'balls.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.image('snowflake', 'snowflake.png');
+    this.load.spritesheet('snowflake_particles', 'snowflake_particles.png', { frameWidth: 8, frameHeight: 18 });
+
 
     // Sounds
     this.load.audio('pop', 'sound/pop.wav');

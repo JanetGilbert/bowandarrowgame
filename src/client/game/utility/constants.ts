@@ -10,6 +10,7 @@ export default class GameLevels {
     { type: 'BirdLevel', phase: 1, arrows: 8, targets: 10}, // 5
     { type: 'BallLevel', phase: 0, arrows: 8, targets: 15}, // 6
     { type: 'BallLevel', phase: 1, arrows: 12, targets: 15}, // 7
+    { type: 'SnowflakeLevel', phase: 0, arrows: 8, targets: 30}, // 8
   ];
 
 
