@@ -39,9 +39,10 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
       scale: { min: 1, max: 2 },
       alpha: { start: 1, end: 0 },
       tint: 0xffffff, // White tint for snowflake particles
-      speed: { min: 100, max: 200 },
-      gravityY: 200,
+      speed: { min: 20, max: 50 },
+      gravityY: 300,
       emitting: false,
+      frame: [0,1,2,3,4,5],
       anim: 'snowflake_pop',
     }).explode();
 
