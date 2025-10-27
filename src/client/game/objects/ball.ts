@@ -76,7 +76,7 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
     if (this.body) {
       this.body.enable = false;
     }
-    // Scale ball to zero over 200ms then destroy
+
     this.scene.tweens.add({
       targets: this,  
       scaleX: 0,

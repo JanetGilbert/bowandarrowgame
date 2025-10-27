@@ -1,5 +1,6 @@
 export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
   static readonly score = 2;
+  private rotationSpeed: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'snowflake');
@@ -7,10 +8,14 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     this.setVelocityX(Phaser.Math.FloatBetween(-20, 20));
     this.setVelocityY(Phaser.Math.FloatBetween(40, 80));
+    this.rotationSpeed = Phaser.Math.FloatBetween(-0.02, 0.02);
 
     // Scale randomly between half and full size
     const scale = Phaser.Math.FloatBetween(0.5, 1.0);
     this.setScale(scale);
+    
+    // Start continuous rotation from random angle
+    this.setRotation(Phaser.Math.FloatBetween(0, Math.PI * 2));
     
     if (this.body) {
       const radius = 25;
@@ -23,6 +28,9 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
 
   override update() {
     this.handleMovement();
+    
+    // Continuous rotation (frame-rate independent)
+    this.rotation += this.rotationSpeed * this.scene.game.loop.delta / 16.67; // Normalized to 60fps
   }
 
   handleMovement() {
@@ -35,6 +43,9 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
       rate: 1.0 + multiplier / 100
     });
 
+    if (this.body) {
+      this.body.enable = false;
+    }
 
     this.scene.add.particles(this.x, this.y, 'snowflake_particles', {
       quantity: 20, 
@@ -49,7 +60,14 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
       anim: 'snowflake_pop',
     }).explode();
 
-    this.destroy();
+    this.scene.tweens.add({
+      targets: this,  
+      alpha: 0,
+      duration: 600,
+      onComplete: () => {
+        this.destroy();
+      }
+    });
     
   }
 
