@@ -29,8 +29,11 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
     
   }
 
-  explode() {
-    this.scene.sound.play('pop2', { volume: 0.5 });
+  explode(multiplier: number = 1) {
+    this.scene.sound.play('glass', { 
+      volume: 0.5,
+      rate: 1.0 + multiplier / 100
+    });
 
 
     this.scene.add.particles(this.x, this.y, 'snowflake_particles', {

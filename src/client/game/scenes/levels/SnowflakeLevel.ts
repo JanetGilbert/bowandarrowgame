@@ -54,7 +54,7 @@ export class SnowflakeLevel extends Scene {
     const scoreToAdd = Snowflake.score * arrow.multiplier;
     this.gameScene.floatScores.add(new FloatScore(this, snowflake.x, snowflake.y, scoreToAdd, 0xffffff));
     this.gameScene.addScore(scoreToAdd);
-    snowflake.explode();
+    snowflake.explode(arrow.multiplier);
     arrow.multiplier += 10;
     this.gameScene.targetsRemaining = Math.max(0, this.gameScene.targetsRemaining - 1);
     this.gameScene.refreshUI();
