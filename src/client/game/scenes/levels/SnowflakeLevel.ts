@@ -8,6 +8,8 @@ export class SnowflakeLevel extends Scene {
   private snowflakes: Phaser.GameObjects.Group;
   private gameScene: Game;
   private phase: number;
+  private snowflakeAddX: number = 50;
+  private patternDirection: number = 1;
 
   constructor() {
     super('SnowflakeLevel');
@@ -38,12 +40,22 @@ export class SnowflakeLevel extends Scene {
     
     this.addSnowflakes();
 
-    this.time.addEvent({
-      delay: Phaser.Math.Between(100, 400),
-      callback: this.addRandomSnowflake,
-      callbackScope: this,
-      loop: true
-    });
+    if (this.phase === 0){
+      this.time.addEvent({
+        delay: 200,
+        callback: this.addRandomSnowflake,
+        callbackScope: this,
+        loop: true
+      });
+    }
+    else {
+      this.time.addEvent({
+        delay: 200,
+        callback: this.addPatternedSnowflake,
+        callbackScope: this,
+        loop: true
+      });
+    }
 
     this.physics.add.overlap(this.gameScene.archer.arrow, this.snowflakes, this.hitSnowflake, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
@@ -81,8 +93,23 @@ export class SnowflakeLevel extends Scene {
         this.addRandomSnowflake(y);
       }
     }
-    
+  }
 
+  addPatternedSnowflake() {
+    const xSpacing: number = 50;
+    const xBorder: number = 50;
+    const y: number = -50;
+    console.log('Adding patterned snowflake at', this.snowflakeAddX, y);
+    const newSnowflake = this.snowflakes.create(this.snowflakeAddX, y, 'snowflake');
+    if (newSnowflake!=null){
+      this.snowflakeAddX += xSpacing * this.patternDirection;
+      if (this.snowflakeAddX >= this.cameras.main.width - xBorder || this.snowflakeAddX <= xBorder) {
+        this.patternDirection *= -1;
+      }
+      newSnowflake.setVelocityX(0);
+      newSnowflake.setVelocityY(60);
+    }
+    return newSnowflake;
   }
 
   addRandomSnowflake(y: number) : Snowflake | null {
@@ -101,6 +128,8 @@ export class SnowflakeLevel extends Scene {
         newSnowflake.destroy(); // Remove and try again
       }
       else{
+          newSnowflake.setVelocityX(Phaser.Math.FloatBetween(-20, 20));
+          newSnowflake.setVelocityY(Phaser.Math.FloatBetween(40, 80));
         return newSnowflake;
       }
     }

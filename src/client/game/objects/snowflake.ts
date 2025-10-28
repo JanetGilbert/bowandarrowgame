@@ -6,8 +6,7 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, 'snowflake');
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setVelocityX(Phaser.Math.FloatBetween(-20, 20));
-    this.setVelocityY(Phaser.Math.FloatBetween(40, 80));
+
     this.rotationSpeed = Phaser.Math.FloatBetween(-0.02, 0.02);
 
     // Scale randomly between half and full size
