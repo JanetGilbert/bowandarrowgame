@@ -7,9 +7,7 @@ import Snowflake from '@objects/snowflake.js';
 export class SnowflakeLevel extends Scene {
   private snowflakes: Phaser.GameObjects.Group;
   private gameScene: Game;
-  private phase: number;
-  private snowflakeAddX: number = 50;
-  private patternDirection: number = 1;
+  public phase: number;
 
   constructor() {
     super('SnowflakeLevel');
@@ -21,7 +19,7 @@ export class SnowflakeLevel extends Scene {
 
   preload() {
 
-   }
+ }
  
 
   create() {
@@ -48,14 +46,7 @@ export class SnowflakeLevel extends Scene {
         loop: true
       });
     }
-    else {
-      this.time.addEvent({
-        delay: 200,
-        callback: this.addPatternedSnowflake,
-        callbackScope: this,
-        loop: true
-      });
-    }
+
 
     this.physics.add.overlap(this.gameScene.archer.arrow, this.snowflakes, this.hitSnowflake, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
@@ -66,7 +57,13 @@ export class SnowflakeLevel extends Scene {
     const scoreToAdd = Snowflake.score * arrow.multiplier;
     this.gameScene.floatScores.add(new FloatScore(this, snowflake.x, snowflake.y, scoreToAdd, 0xffffff));
     this.gameScene.addScore(scoreToAdd);
-    snowflake.explode(arrow.multiplier);
+
+    this.sound.play('glass', { 
+      volume: 0.5,
+      rate: 1.0 + (arrow.multiplier / 100)
+    });
+
+    snowflake.explode();
     arrow.multiplier += 10;
     this.gameScene.targetsRemaining = Math.max(0, this.gameScene.targetsRemaining - 1);
     this.gameScene.refreshUI();
@@ -76,13 +73,21 @@ export class SnowflakeLevel extends Scene {
   override update() 
   {
     // Destroy snowflakes that go off the bottom of the screen
-    this.snowflakes.children.entries.forEach((snowflake: any) => {
-      if (snowflake.active && snowflake.y > this.cameras.main.height + 50) {
-        snowflake.destroy();
-      }
-    });
+    if (this.phase === 0) {
+      this.snowflakes.children.entries.forEach((snowflake: any) => {
+        if (snowflake.active && snowflake.y > this.cameras.main.height + 50) {
+          snowflake.destroy();
+        }
+      });
+    }
+    else {
+      this.snowflakes.children.entries.forEach((snowflake: any) => {
+        if (snowflake.active) {
+          this.physics.world.wrap(snowflake, 32);
+        }
+      });
+    } 
   }
-
 
 
   addSnowflakes() {
@@ -93,26 +98,43 @@ export class SnowflakeLevel extends Scene {
         this.addRandomSnowflake(y);
       }
     }
-  }
-
-  addPatternedSnowflake() {
-    const xSpacing: number = 50;
-    const xBorder: number = 50;
-    const y: number = -50;
-    console.log('Adding patterned snowflake at', this.snowflakeAddX, y);
-    const newSnowflake = this.snowflakes.create(this.snowflakeAddX, y, 'snowflake');
-    if (newSnowflake!=null){
-      this.snowflakeAddX += xSpacing * this.patternDirection;
-      if (this.snowflakeAddX >= this.cameras.main.width - xBorder || this.snowflakeAddX <= xBorder) {
-        this.patternDirection *= -1;
+    else {
+      for (let i = 0; i < 20; i++) {
+        this.addSwirlingSnowflake();
       }
-      newSnowflake.setVelocityX(0);
-      newSnowflake.setVelocityY(60);
     }
-    return newSnowflake;
   }
 
-  addRandomSnowflake(y: number) : Snowflake | null {
+  addSwirlingSnowflake() {
+    var overlapping = true;
+    var tries = 0;
+
+    while (overlapping && tries < 10  ) {
+      tries++;
+      const x = Phaser.Math.Between(0, this.cameras.main.width);
+      const y = Phaser.Math.Between(50, 400);
+
+      const newSnowflake = this.snowflakes.create(x, y, 'snowflake');
+
+      if (newSnowflake==null){
+        return null;
+      }
+
+      newSnowflake.setPhase(this.phase);
+
+      overlapping = this.physics.overlap(newSnowflake, this.snowflakes);
+      tries++;
+      if (overlapping) {
+        newSnowflake.destroy(); // Remove and try again
+      }
+      else{
+        return newSnowflake;
+      }
+    }
+    return null;
+  }
+
+  addRandomSnowflake(y: number = -50) : Snowflake | null {
     var overlapping = true;
     var tries = 0;
 
@@ -138,7 +160,6 @@ export class SnowflakeLevel extends Scene {
   }
 
   shutdown() {
-    console.log('Shutting down SnowflakeLevel');
     // Clean up snowflake group when leaving the scene
     if (this.snowflakes) {
       this.snowflakes.clear(true, true);

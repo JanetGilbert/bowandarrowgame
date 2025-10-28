@@ -1,13 +1,16 @@
+
 export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
   static readonly score = 2;
-  private rotationSpeed: number;
+  private swirlingRotation: number = 0;
+  private swirlingSpeed: number = 0;
+  private phase: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'snowflake');
     scene.add.existing(this);
     scene.physics.add.existing(this);
-
-    this.rotationSpeed = Phaser.Math.FloatBetween(-0.02, 0.02);
+    this.swirlingRotation = Phaser.Math.FloatBetween(-50, 50);
+    this.swirlingSpeed = Phaser.Math.FloatBetween(40, 60);
 
     // Scale randomly between half and full size
     const scale = Phaser.Math.FloatBetween(0.5, 1.0);
@@ -17,6 +20,7 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
     this.setRotation(Phaser.Math.FloatBetween(0, Math.PI * 2));
     
     if (this.body) {
+      this.setAngularVelocity(Phaser.Math.FloatBetween(-50, 50));
       const radius = 25;
       this.body.setCircle(radius);
       (this.body as Phaser.Physics.Arcade.Body).debugShowBody = true;
@@ -25,22 +29,29 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
     this.createAnimations();
   }
 
+  setPhase(phase: number) {
+    this.phase = phase;
+  }
+
   override update() {
     this.handleMovement();
-    
-    // Continuous rotation (frame-rate independent)
-    this.rotation += this.rotationSpeed * this.scene.game.loop.delta / 16.67; // Normalized to 60fps
   }
 
   handleMovement() {
-    
+    if (this.phase === 1) {
+      this.swirlingRotation += 0.0005 * this.scene.game.loop.delta;
+      if (this.swirlingRotation > Math.PI * 2) {
+        this.swirlingRotation = this.swirlingRotation - (Math.PI * 2);
+      }
+
+      if (this.body) {
+        this.scene.physics.velocityFromRotation(this.swirlingRotation, this.swirlingSpeed, this.body.velocity);
+      } 
+    }
   }
 
-  explode(multiplier: number = 1) {
-    this.scene.sound.play('glass', { 
-      volume: 0.5,
-      rate: 1.0 + multiplier / 100
-    });
+  explode() {
+
 
     if (this.body) {
       this.body.enable = false;
