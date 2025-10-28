@@ -8,13 +8,15 @@ export class BubbleLevel extends Scene {
   private bubbles: Phaser.GameObjects.Group;
   private gameScene: Game;
   private phase: number;
+  private targets: number;
 
   constructor() {
     super('BubbleLevel');
   }
 
-  init(data: { phase?: number }) {
+  init(data: { phase?: number, targets?: number }) {
     this.phase = data.phase || 0;
+    this.targets = data.targets || 20;
   }
 
   preload() {
@@ -31,7 +33,7 @@ export class BubbleLevel extends Scene {
     
     this.bubbles = this.add.group({
       classType: Bubble,
-      maxSize: 30,
+      maxSize: 40,
       runChildUpdate: true
     });
 
@@ -56,7 +58,7 @@ export class BubbleLevel extends Scene {
   
   override update() {
 
-   
+   //console.log("BubbleLevel update ", this.bubbles.children.size); 
   }
 
 
@@ -64,16 +66,20 @@ export class BubbleLevel extends Scene {
   addBubbles() {
 
     if (this.phase === 0){
-      for (let i = 0; i < this.bubbles.maxSize; i++) {
+      for (let i = 0; i < this.targets; i++) {
         this.addRandomBubble();
       }
+
+      if (this.bubbles.children.size < this.targets) {
+        this.gameScene.targetsRemaining = this.bubbles.children.size;
+        this.gameScene.refreshUI();
+      } 
     }
     else {
-      // Add bubbles periodically
       this.time.addEvent({
         delay: Phaser.Math.Between(250, 750), 
         callback: () => {
-          if (this.bubbles.children.size < this.bubbles.maxSize) {
+          if (this.bubbles.children.size < this.targets) {
             const newBubble =  this.addRandomBubble();
             if (newBubble) { // fade in
               newBubble.setAlpha(0);
@@ -108,12 +114,11 @@ export class BubbleLevel extends Scene {
     var overlapping = true;
     var tries = 0;
 
-    while (overlapping && tries < 10  ) {
+    while (overlapping && tries < 20  ) {
       tries++;
-      const x = Phaser.Math.Between(0, this.cameras.main.width);
-      const y = Phaser.Math.Between(50, 400);
+      const x = Phaser.Math.Between(50, this.cameras.main.width-50);
+      const y = Phaser.Math.Between(50, 500);
       const newBubble = this.bubbles.create(x, y, 'bubble');
-      newBubble.setVelocityX(Phaser.Math.FloatBetween(40, 60));
       overlapping = this.physics.overlap(newBubble, this.bubbles);
       if (overlapping) {
         newBubble.destroy(); // Remove and try again
@@ -122,6 +127,7 @@ export class BubbleLevel extends Scene {
         return newBubble;
       }
     }
+    console.log("Failed to add bubble", this.bubbles.children.size, "after", tries, "tries");
     return null;
 
   }

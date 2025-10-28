@@ -20,7 +20,6 @@ export default class Bubble extends Phaser.Physics.Arcade.Sprite {
     if (this.body) {
       const radius = 25;
       this.body.setCircle(radius);
-      //this.body.setOffset((this.width - radius * 2) / 2, (this.height - radius * 2) / 2);
       (this.body as Phaser.Physics.Arcade.Body).debugShowBody = true;
     }
     
@@ -38,6 +37,7 @@ export default class Bubble extends Phaser.Physics.Arcade.Sprite {
       if (this.y < -this.height) {
         this.y = this.scene.scale.height + this.height;
       }
+    //  console.log("oscilate", this.scene.time.now * this.oscillate, "variance", this.variance);
       this.x = this.centerX + Math.sin(this.scene.time.now * this.oscillate) * this.variance;
     }
   }

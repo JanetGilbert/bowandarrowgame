@@ -61,7 +61,7 @@ export class Game extends Scene {
     const level = this.registry.get('level') || 0;
     const [levelType, phase, arrows, targets] = GameLevels.getLevelDefinition(level);
     console.log(`Starting level: ${levelType}, phase: ${phase}`);
-    this.scene.launch(levelType, { phase: phase });
+    this.scene.launch(levelType, { phase: phase, targets: targets });
     
     // UI
     this.arrowsRemaining = arrows;
