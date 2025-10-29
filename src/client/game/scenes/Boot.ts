@@ -10,6 +10,7 @@ export class Boot extends Scene {
     //  The smaller the file size of the assets, the better, as the Boot Scene itself has no preloader.
 
     this.load.image('background', 'assets/backgrounds/title_background.png');
+    this.load.bitmapFont('coffee_spark', 'assets/fonts/CoffeeSpark.png', 'assets/fonts/CoffeeSpark.xml');
   }
 
   create() {

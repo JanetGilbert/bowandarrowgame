@@ -7,23 +7,38 @@ export class Preloader extends Scene {
 
   init() {
     //  We loaded this image in our Boot Scene, so we can display it here
-    this.add.image(512, 384, 'background');
+    this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
+
+    // Ttle
+    this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'coffee_spark', 'ZenArcher', 64).setOrigin(0.5);
 
     //  A simple progress bar. This is the outline of the bar.
-    this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
+    const progressBarWidth = 150;
+    const progressBarHeight = 30;
+    this.add.rectangle(this.cameras.main.centerX, 
+                      this.cameras.main.centerY + 100, 
+                      progressBarWidth, 
+                      progressBarHeight).setStrokeStyle(1, 0xfebfff);
 
     //  This is the progress bar itself. It will increase in size from the left based on the % of progress.
-    const bar = this.add.rectangle(512 - 230, 384, 4, 28, 0xffffff);
+    const bar = this.add.rectangle(this.cameras.main.centerX - (progressBarWidth/2), 
+                                  this.cameras.main.centerY + 100, 
+                                  4, 
+                                  progressBarHeight - 4, 0xffffff);
 
     //  Use the 'progress' event emitted by the LoaderPlugin to update the loading bar
     this.load.on('progress', (progress: number) => {
-      //  Update the progress bar (our bar is 464px wide, so 100% = 464px)
-      bar.width = 4 + 460 * progress;
+      //  Update the progress bar 
+      bar.width = 4 + (progressBarWidth - 4) * progress;
     });
   }
 
   preload() {
     this.load.setPath('assets');
+
+    // Fonts
+    this.load.bitmapFont('moghul', 'fonts/Moghul.png', 'fonts/Moghul.xml');
+
 
     // Images and spritesheets
     this.load.image('logo', 'logo.png');
@@ -31,8 +46,7 @@ export class Preloader extends Scene {
     this.load.image('arrow', 'arrow.png');
     this.load.image('balloon', 'balloon.png');
     this.load.spritesheet('balloon_particles', 'balloon_particles.png', { frameWidth: 16, frameHeight: 16});;
-    this.load.bitmapFont('moghul', 'fonts/Moghul.png', 'fonts/Moghul.xml');
-    this.load.bitmapFont('moghul_white', 'fonts/moghul_white.png', 'fonts/moghul_white.xml');
+
     this.load.image('target', 'target.png');
     this.load.spritesheet('bubble', 'bubble.png', { frameWidth: 50, frameHeight: 50 });
     this.load.spritesheet('bird', 'bird.png', { frameWidth: 50, frameHeight: 50 });
@@ -45,7 +59,6 @@ export class Preloader extends Scene {
     this.load.image('land_background', 'backgrounds/land_background.png');
     this.load.image('colorful_background', 'backgrounds/colorful_background.png');
     this.load.image('land2_background', 'backgrounds/land2_background.png');
-    this.load.image('pastel_background', 'backgrounds/pastel_background.png');
     this.load.image('sea_background', 'backgrounds/sea_background.png');
     this.load.image('snow_background', 'backgrounds/snow_background.png');
     this.load.image('title_background', 'backgrounds/title_background.png');
