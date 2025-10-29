@@ -39,10 +39,10 @@ export class Preloader extends Scene {
     // Fonts
     this.load.bitmapFont('moghul', 'fonts/Moghul.png', 'fonts/Moghul.xml');
     this.load.bitmapFont('moghul_white', 'fonts/moghul_white.png', 'fonts/moghul_white.xml');
+    this.load.bitmapFont('moghul_outline', 'fonts/MoghulOutline.png', 'fonts/MoghulOutline.xml');
 
 
     // Images and spritesheets
-    this.load.image('logo', 'logo.png');
     this.load.spritesheet('archer', 'archer.png', { frameWidth: 144, frameHeight: 144 });
     this.load.image('arrow', 'arrow.png');
     this.load.image('balloon', 'balloon.png');
