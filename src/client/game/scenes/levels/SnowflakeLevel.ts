@@ -75,7 +75,7 @@ export class SnowflakeLevel extends Scene {
     // Destroy snowflakes that go off the bottom of the screen
     if (this.phase === 0) {
       this.snowflakes.children.entries.forEach((snowflake: any) => {
-        if (snowflake.active && snowflake.y > this.cameras.main.height + 50) {
+        if (snowflake.active && snowflake.y > this.cameras.main.height) {
           snowflake.destroy();
         }
       });
