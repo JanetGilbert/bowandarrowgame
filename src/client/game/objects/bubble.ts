@@ -37,7 +37,7 @@ export default class Bubble extends Phaser.Physics.Arcade.Sprite {
       if (this.y < -this.height) {
         this.y = this.scene.scale.height + this.height;
       }
-    //  console.log("oscilate", this.scene.time.now * this.oscillate, "variance", this.variance);
+
       this.x = this.centerX + Math.sin(this.scene.time.now * this.oscillate) * this.variance;
     }
   }

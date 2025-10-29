@@ -57,8 +57,6 @@ export class BubbleLevel extends Scene {
 
   
   override update() {
-
-   //console.log("BubbleLevel update ", this.bubbles.children.size); 
   }
 
 
