@@ -46,11 +46,7 @@ export class MainMenu extends Scene {
     // Resize camera to new viewport to prevent black bars
     this.cameras.resize(width, height);
 
-    // Background – stretch to fill the whole canvas
-    if (!this.background) {
-      this.background = this.add.image(0, 0, 'background').setOrigin(0);
-    }
-    this.background!.setDisplaySize(width, height);
+    this.background = this.add.image(0, 0, 'title_background').setOrigin(0);
 
     // Logo – keep aspect but scale down for very small screens
    // const scaleFactor = Math.min(width / 1024, height / 768);

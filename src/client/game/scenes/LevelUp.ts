@@ -3,58 +3,62 @@ import * as Phaser from 'phaser';
 
 export class LevelUp extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
-  background: Phaser.GameObjects.Image;
-  levelup_text: Phaser.GameObjects.Text;
-  finalScoreText: Phaser.GameObjects.Text;
-  highScoreText: Phaser.GameObjects.Text;
-  restartText: Phaser.GameObjects.Text;
+  background: Phaser.GameObjects.Image | null = null;
+  levelupText: Phaser.GameObjects.BitmapText | null = null;
+  nextLevelText: Phaser.GameObjects.BitmapText | null = null;
+  nextLevelButton: Phaser.GameObjects.BitmapText | null = null;
 
   constructor() {
     super('LevelUp');
   }
 
+  init(): void {
+    this.levelupText = null;
+    this.nextLevelText = null;
+    this.nextLevelButton = null;
+    this.background = null;
+
+  }
+
   create() {
     this.camera = this.cameras.main;
-    this.camera.setBackgroundColor(0x90EE90); // Light green background
 
-    // Background – create once, full-screen
-    this.background = this.add.image(0, 0, 'background').setOrigin(0).setAlpha(0.3);
+    if (!this.background) {
+      this.background = this.add.image(0, 0, 'title_background').setOrigin(0);
+    }
 
-    this.levelup_text = this.add
-      .text(0, 0, 'Level Up!', {
-        fontFamily: 'Arial Black',
-        fontSize: '24px',
-        color: '#000000',
-        stroke: '#ffffff',
-        strokeThickness: 4,
-        align: 'center',
-      })
-      .setOrigin(0.5);
+    this.levelupText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 
+                                           'moghul_outline', 'Level Up!', 64).setOrigin(0.5);
 
-    // Restart instruction
-    this.restartText = this.add
-      .text(0, 0, 'Click or Press SPACE for level ' + ((this.registry.get('level') || 0) + 2), {
-        fontFamily: 'Arial',
-        fontSize: '24px',
-        color: '#000000',
-        align: 'center',
-      })
-      .setOrigin(0.5);
+    const currentLevel = this.registry.get('level') || 0;
+    const nextLevel = currentLevel + 2;
+    
+    this.nextLevelText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 100, 'moghul_outline', `Next Level: ${nextLevel}`, 32).setOrigin(0.5);
 
-    // Initial responsive layout
-    this.updateLayout(this.scale.width, this.scale.height);
+     // Next level button
+    this.nextLevelButton = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.height -100, 'coffee_spark', 'Start!', 64).setOrigin(0.5);
+    this.nextLevelButton.setInteractive();
 
-    // Update layout on canvas resize / orientation change
-    this.scale.on('resize', (gameSize: Phaser.Structs.Size) => {
-      const { width, height } = gameSize;
-      this.updateLayout(width, height);
+    this.nextLevelButton.on('pointerover', () => {
+      this.nextLevelButton?.setTint(0xc7bfff);
     });
 
-    // Add half second delay before accepting input
+    this.nextLevelButton.on('pointerout', () => {
+      this.nextLevelButton?.clearTint(); 
+    });
+
+    // Click effects
+    this.nextLevelButton.on('pointerdown', () => {
+      this.nextLevelButton?.setPosition(this.nextLevelButton.x + 2, this.nextLevelButton.y + 2); // Shadow effect
+    });
+
+    this.nextLevelButton.on('pointerup', () => {
+      this.nextLevelButton?.setPosition(this.nextLevelButton.x - 2, this.nextLevelButton.y - 2); // Remove shadow
+      this.nextLevel();
+    });          
+    
+    // Add half second delay before accepting keyboard input
     this.time.delayedCall(500, () => {
-      this.input.once('pointerdown', () => {
-        this.nextLevel();
-      });
 
       this.input.keyboard!.once('keydown-SPACE', () => {
         this.nextLevel();
@@ -68,27 +72,4 @@ export class LevelUp extends Scene {
     this.scene.start('Game');
   }
 
-  private updateLayout(width: number, height: number): void {
-    // Resize camera viewport to prevent black bars
-    this.cameras.resize(width, height);
-
-    // Stretch background to fill entire screen
-    if (this.background) {
-      this.background.setDisplaySize(width, height);
-    }
-
-    // Compute scale factor (never enlarge above 1×)
-    const scaleFactor = Math.min(Math.min(width / 1024, height / 768), 1);
-
-    // Centre and scale all text elements
-    if (this.levelup_text) {
-      this.levelup_text.setPosition(width / 2, height * 0.3);
-      this.levelup_text.setScale(scaleFactor);
-    }
-    
-    if (this.restartText) {
-      this.restartText.setPosition(width / 2, height * 0.7);
-      this.restartText.setScale(scaleFactor);
-    }
-  }
 }

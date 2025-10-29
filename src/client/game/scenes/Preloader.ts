@@ -7,7 +7,7 @@ export class Preloader extends Scene {
 
   init() {
     //  We loaded this image in our Boot Scene, so we can display it here
-    this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
+    this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'title_background');
 
     // Ttle
     this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'coffee_spark', 'ZenArcher', 64).setOrigin(0.5);
@@ -62,7 +62,7 @@ export class Preloader extends Scene {
     this.load.image('land2_background', 'backgrounds/land2_background.png');
     this.load.image('sea_background', 'backgrounds/sea_background.png');
     this.load.image('snow_background', 'backgrounds/snow_background.png');
-    this.load.image('title_background', 'backgrounds/title_background.png');
+   // this.load.image('title_background', 'backgrounds/title_background.png');
 
 
     // Sounds
