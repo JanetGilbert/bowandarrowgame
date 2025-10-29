@@ -38,6 +38,7 @@ export class Preloader extends Scene {
 
     // Fonts
     this.load.bitmapFont('moghul', 'fonts/Moghul.png', 'fonts/Moghul.xml');
+    this.load.bitmapFont('moghul_white', 'fonts/moghul_white.png', 'fonts/moghul_white.xml');
 
 
     // Images and spritesheets
