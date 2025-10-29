@@ -28,7 +28,7 @@ export class LevelUp extends Scene {
     }
 
     this.levelupText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 
-                                           'moghul_outline', 'Level Up!', 64).setOrigin(0.5);
+                                           'coffee_spark', 'Level Up!', 64).setOrigin(0.5);
 
     const currentLevel = this.registry.get('level') || 0;
     const nextLevel = currentLevel + 2;
@@ -47,7 +47,6 @@ export class LevelUp extends Scene {
       this.nextLevelButton?.clearTint(); 
     });
 
-    // Click effects
     this.nextLevelButton.on('pointerdown', () => {
       this.nextLevelButton?.setPosition(this.nextLevelButton.x + 2, this.nextLevelButton.y + 2); // Shadow effect
     });

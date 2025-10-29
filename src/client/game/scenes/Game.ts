@@ -101,11 +101,20 @@ export class Game extends Scene {
 
   addScore(points: number) {
     const score = this.registry.get('score') || 0;
+    const highScore = this.registry.get('highscore') || 0;
     this.registry.set('score', score + points);
+
+    if (score + points > highScore) {
+      this.registry.set('highscore', score + points);
+    }
   }
 
   private getScore(): number {
     return this.registry.get('score') || 0;
+  }
+
+  private getHighScore(): number {
+    return this.registry.get('highscore') || 0;
   }
 
   onArrowUsed() {
@@ -143,7 +152,7 @@ export class Game extends Scene {
     this.removeScenes();
     this.scene.start('GameOver', { 
       score: this.getScore(), 
-      highScore: this.highScore 
+      highScore: this.getHighScore() 
     });
   }
 
