@@ -41,6 +41,15 @@ export class Preloader extends Scene {
     this.load.image('snowflake', 'snowflake.png');
     this.load.spritesheet('snowflake_particles', 'snowflake_particles.png', { frameWidth: 8, frameHeight: 8 });
 
+    // Backgrounds
+    this.load.image('land_background', 'backgrounds/land_background.png');
+    this.load.image('colorful_background', 'backgrounds/colorful_background.png');
+    this.load.image('land2_background', 'backgrounds/land2_background.png');
+    this.load.image('pastel_background', 'backgrounds/pastel_background.png');
+    this.load.image('sea_background', 'backgrounds/sea_background.png');
+    this.load.image('snow_background', 'backgrounds/snow_background.png');
+    this.load.image('title_background', 'backgrounds/title_background.png');
+
 
     // Sounds
     this.load.audio('pop', 'sound/pop.wav');

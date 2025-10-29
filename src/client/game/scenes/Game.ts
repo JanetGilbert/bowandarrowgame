@@ -37,9 +37,31 @@ export class Game extends Scene {
  
 
   create() {
+    const level = this.registry.get('level') || 0;
+    const [levelType, phase, arrows, targets] = GameLevels.getLevelDefinition(level);
 
-    this.cameras.main.setBackgroundColor(0x90EE90); // Light green background
-    
+    // Draw background
+    switch (levelType) {
+      case 'BalloonLevel':
+        this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'land_background').setOrigin(0.5);
+        break;
+
+        case 'BallLevel':
+        this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'colorful_background').setOrigin(0.5);
+        break;
+
+      case 'BubbleLevel':
+        this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'sea_background').setOrigin(0.5);
+        break;
+
+      case 'SnowflakeLevel':
+        this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'snow_background').setOrigin(0.5);
+        break;
+      case 'BirdLevel':
+        this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'land2_background').setOrigin(0.5);
+        break;
+    }
+
     this.floatScores = this.add.group({
       classType: FloatScore,
       runChildUpdate: true,
@@ -58,11 +80,10 @@ export class Game extends Scene {
     music.play();
 
     // Set up level 
-    const level = this.registry.get('level') || 0;
-    const [levelType, phase, arrows, targets] = GameLevels.getLevelDefinition(level);
     console.log(`Starting level: ${levelType}, phase: ${phase}`);
     this.scene.launch(levelType, { phase: phase, targets: targets });
-    
+
+ 
     // UI
     this.arrowsRemaining = arrows;
     this.targetsRemaining = targets;
