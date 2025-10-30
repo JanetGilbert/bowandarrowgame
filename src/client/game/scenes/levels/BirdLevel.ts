@@ -39,6 +39,16 @@ export class BirdLevel extends Scene {
     
     this.addBirds();
 
+    if (this.phase === 1){
+      this.time.addEvent({
+        delay: 200,
+        callback: this.addDivingBird,
+        callbackScope: this,
+        loop: true
+      });
+    }
+
+
     this.physics.add.overlap(this.gameScene.archer.arrow, this.birds, this.hitBird, undefined, this);
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
 
@@ -92,26 +102,44 @@ export class BirdLevel extends Scene {
 
       }
     }
-    else{ // set birds to wheel arround in randomly sized circles
-      for (let i = 0; i < 20; i++) {
-        console.log('Adding bird in phase 1 ', i);
-        const x = Phaser.Math.Between(0, this.cameras.main.width);
-        const y = Phaser.Math.Between(50, 400);
-        const newBird = this.birds.create(x, y, 'bird');
-        newBird.setVelocityX(Phaser.Math.FloatBetween(40, 60));
-        newBird.setAngularVelocity(Phaser.Math.FloatBetween(-100, 100));
-
-        // Check for overlap with existing birds
-        const overlapping = this.physics.overlap(newBird, this.birds);
-        if (overlapping) {
-          newBird.destroy(); // Remove and try again
-          i--; // Decrement i to retry this iteration
-        }
+    else{ 
+      for (let i = 0; i < 10; i++) {
+        this.addDivingBird();
       }
     }
   }
 
-  
+  addDivingBird() {
+    var overlapping = true;
+    var tries = 0;  
+
+    if (this.birds.children.size >= this.birds.maxSize) {
+      return; 
+    }
+
+    while (overlapping && tries < 10) {
+      const x = Phaser.Math.Between(-200, this.cameras.main.width + 200);
+      const y = Phaser.Math.Between(0, -100);
+      const newBird = this.birds.create(x, y, 'bird');
+      newBird.setVelocityX(Phaser.Math.Between(20, 40));
+      newBird.setVelocityY(Phaser.Math.Between(75, 125));
+
+      if (newBird.x > this.cameras.main.width / 2) {
+        newBird.setFlipX(true); 
+        newBird.setVelocityX(-newBird.body.velocity.x);
+      }
+
+      // Check for overlap with existing birds
+      const overlapping = this.physics.overlap(newBird, this.birds);
+      if (overlapping) {
+        newBird.destroy(); // Remove and try again
+        tries++;
+      }
+      else{
+        return;
+      }
+    }
+  }
 
   shutdown() {
     // Clean up bird group when leaving the scene

@@ -2,25 +2,14 @@ import { BirdLevel } from "@game/scenes/levels/BirdLevel";
 
 export default class Bird extends Phaser.Physics.Arcade.Sprite {
   static readonly score = 3;
-  private centerX: number;
-  private centerY: number;
-  private radius: number;
-  private circleAngle: number;
-  private angularSpeed: number;
+  private readonly phase: number = (this.scene as BirdLevel).phase;
+  private timeToChange: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'bird');
     scene.add.existing(this);
     scene.physics.add.existing(this);
-   
-    // Initialize circular movement properties
-    if ((this.scene as BirdLevel).phase == 1) {
-      this.centerX = x;
-      this.centerY = y;
-      this.radius = Phaser.Math.Between(50, 150);
-      this.circleAngle = Phaser.Math.FloatBetween(0, Math.PI * 2);
-      this.angularSpeed = Phaser.Math.FloatBetween(0.001, 0.003);
-    }
+  
 
     this.createAnimations(); 
 
@@ -39,7 +28,11 @@ export default class Bird extends Phaser.Physics.Arcade.Sprite {
       
       (this.body as Phaser.Physics.Arcade.Body).debugShowBody = true;
     }
-    
+
+    if (this.phase === 1){
+      this.timeToChange = Phaser.Math.Between(500, 2000);
+    }
+
   }
 
   
@@ -58,32 +51,40 @@ export default class Bird extends Phaser.Physics.Arcade.Sprite {
   override update() {
     //   this.setVelocity(-50, 0);
     this.handleMovement();
+
+    if (this.phase === 1 && this.scene?.game){
+      this.timeToChange -= this.scene.game.loop.delta;  
+      if (this.timeToChange <= 0) {
+        if (this.body) {
+          const body = this.body as Phaser.Physics.Arcade.Body;
+          const velocity = body.velocity;
+          if (velocity.x < 0) {
+            this.setVelocityX(Phaser.Math.Between(30, 60));
+          } else {
+            this.setVelocityX(Phaser.Math.Between(-60, -30));
+          }
+          this.setVelocityY(Phaser.Math.Between(75, 125));
+        }
+
+        this.flipX = !this.flipX;
+        this.timeToChange = Phaser.Math.Between(1000, 3000);
+      } 
+    }
   }
 
   handleMovement() {
-    const phase = (this.scene as BirdLevel).phase;
-    if (phase== 0) {
+
+    if (this.phase == 0) {
       // wrap using arcade physics wrap
       this.scene.physics.world.wrap(this, 25);
     }
-    if (phase == 1) {
-      // Update circle angle
-      this.circleAngle += this.angularSpeed;
-      
-      // Calculate new position in circular path
-      const newX = this.centerX + Math.cos(this.circleAngle) * this.radius;
-      const newY = this.centerY + Math.sin(this.circleAngle) * this.radius;
-      
-      this.setPosition(newX, newY);
-      
-      // Calculate movement direction and face that way
-      const velocityX = -Math.sin(this.circleAngle) * this.angularSpeed;
-      const velocityY = Math.cos(this.circleAngle) * this.angularSpeed;
-      
-      // Set rotation to face movement direction
-      this.setRotation(Math.atan2(velocityY, velocityX));
+    if (this.phase == 1) {
+      if (this.y > this.scene.scale.height + this.height) {
+        this.destroy();
+      }
     }
   }
+
 
   explode() {
     const sfxVolume = this.scene.registry.get('sfxVolume');

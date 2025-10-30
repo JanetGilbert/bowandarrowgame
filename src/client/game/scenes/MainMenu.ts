@@ -32,7 +32,7 @@ export class MainMenu extends Scene {
     this.registry.set('level', 0);
     this.registry.set('score', 0);
     const sfxVolume = this.registry.get('sfxVolume');
-console.log('SFX volume on main menu create:', sfxVolume);
+
     if (sfxVolume === undefined) {
       this.registry.set('sfxVolume', 0.5); // Default volume
     }
