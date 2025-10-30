@@ -35,6 +35,9 @@ export class MainMenu extends Scene {
     // Re-calculate positions whenever the game canvas is resized (e.g. orientation change).
     this.scale.on('resize', () => this.refreshLayout());
 
+    // Play background music
+    const music = this.sound.add('music', { loop: true, volume: 1.0 });
+    music.play();
   }
 
   /**

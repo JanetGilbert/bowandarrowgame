@@ -75,7 +75,7 @@ export class Instructions extends Scene {
                               '[Q] Left, [E] Right, [Space] Fire', 24).setOrigin(0.5);
 
      // Back button
-    this.backButton = this.add.bitmapText(this.cameras.main.centerX, 530, 'coffee_spark', 'Main Menu', 64).setOrigin(0.5);
+    this.backButton = this.add.bitmapText(this.cameras.main.centerX, 530, 'coffee_spark', 'Main Menu', 48).setOrigin(0.5);
     this.backButton.setInteractive();
 
     this.backButton.on('pointerover', () => {

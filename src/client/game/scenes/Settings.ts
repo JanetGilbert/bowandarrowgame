@@ -4,18 +4,18 @@ import * as Phaser from 'phaser';
 export class Settings extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
   background: Phaser.GameObjects.Image | null = null;
-  levelupText: Phaser.GameObjects.BitmapText | null = null;
-  nextLevelText: Phaser.GameObjects.BitmapText | null = null;
-  nextLevelButton: Phaser.GameObjects.BitmapText | null = null;
+  titleText: Phaser.GameObjects.BitmapText | null = null;
+  effectsText: Phaser.GameObjects.BitmapText | null = null;
+  musicText: Phaser.GameObjects.BitmapText | null = null;
+  backButton: Phaser.GameObjects.BitmapText | null = null;
 
   constructor() {
     super('Settings');
   }
 
   init(): void {
-    this.levelupText = null;
-    this.nextLevelText = null;
-    this.nextLevelButton = null;
+    this.effectsText = null;
+    this.musicText = null;
     this.background = null;
 
   }
@@ -27,48 +27,90 @@ export class Settings extends Scene {
       this.background = this.add.image(0, 0, 'title_background').setOrigin(0);
     }
 
-    this.levelupText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 
-                                           'coffee_spark', 'Level Up!', 64).setOrigin(0.5);
+    this.titleText = this.add.bitmapText(this.cameras.main.centerX, 50, 
+                                           'coffee_spark', 'Settings', 48).setOrigin(0.5);
 
-    const currentLevel = this.registry.get('level') || 0;
-    const nextLevel = currentLevel + 2;
+
+    // Effects volume slider
+    this.effectsText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 100, 'moghul_outline', `Effects`, 32).setOrigin(0.5);
+
+    const sliderTrack = this.add.rectangle(this.cameras.main.centerX, this.cameras.main.centerY - 50, 200, 10, 0x666666);
     
-    this.nextLevelText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 100, 'moghul_outline', `Next Level: ${nextLevel}`, 32).setOrigin(0.5);
-
-     // Next level button
-    this.nextLevelButton = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.height -100, 'coffee_spark', 'Start!', 64).setOrigin(0.5);
-    this.nextLevelButton.setInteractive();
-
-    this.nextLevelButton.on('pointerover', () => {
-      this.nextLevelButton?.setTint(0xc7bfff);
+    const currentVolume = this.registry.get('sfxVolume') || 1.0;
+    const sliderHandle = this.add.circle(this.cameras.main.centerX - 100 + (currentVolume * 200), this.cameras.main.centerY - 50, 15, 0xffffff);
+    sliderHandle.setInteractive({ draggable: true });
+    
+    sliderHandle.on('drag', (pointer: any, dragX: number) => {
+      // Constrain to slider track
+      const minX = this.cameras.main.centerX - 100;
+      const maxX = this.cameras.main.centerX + 100;
+      const clampedX = Phaser.Math.Clamp(dragX, minX, maxX);
+      
+      sliderHandle.x = clampedX;
+      
+      // Calculate volume (0.0 to 1.0)
+      const volume = (clampedX - minX) / 200;
+      this.registry.set('sfxVolume', volume);
+      this.sound.volume = volume;     
     });
 
-    this.nextLevelButton.on('pointerout', () => {
-      this.nextLevelButton?.clearTint(); 
+ 
+    // Music volume slider
+   this.musicText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 50, 'moghul_outline', `Music`, 32).setOrigin(0.5);
+
+    const musicSliderTrack = this.add.rectangle(this.cameras.main.centerX, this.cameras.main.centerY + 100, 200, 10, 0x666666);
+    
+    const currentMusicVolume = this.registry.get('musicVolume') || 1.0;
+    const musicSliderHandle = this.add.circle(this.cameras.main.centerX - 100 + (currentMusicVolume * 200), this.cameras.main.centerY + 100, 15, 0xffffff);
+    musicSliderHandle.setInteractive({ draggable: true });
+    
+    musicSliderHandle.on('drag', (pointer: any, dragX: number) => {
+      // Constrain to slider track
+      const minX = this.cameras.main.centerX - 100;
+      const maxX = this.cameras.main.centerX + 100;
+      const clampedX = Phaser.Math.Clamp(dragX, minX, maxX);
+      
+      musicSliderHandle.x = clampedX;
+      
+      // Calculate volume (0.0 to 1.0)
+      const volume = (clampedX - minX) / 200;
+      this.registry.set('musicVolume', volume);
+      // Update music volume if music is playing
+      const music = this.sound.get('music') as Phaser.Sound.WebAudioSound;
+      if (music) {
+        music.setVolume(volume);
+      }
+    });    
+
+    // Back button
+    this.backButton = this.add.bitmapText(this.cameras.main.centerX, 530, 'coffee_spark', 'Main Menu', 48).setOrigin(0.5);
+    this.backButton.setInteractive();
+
+    this.backButton.on('pointerover', () => {
+      this.backButton?.setTint(0xc7bfff);
     });
 
-    this.nextLevelButton.on('pointerdown', () => {
-      this.nextLevelButton?.setPosition(this.nextLevelButton.x + 2, this.nextLevelButton.y + 2); // Shadow effect
+    this.backButton.on('pointerout', () => {
+      this.backButton?.clearTint(); 
     });
 
-    this.nextLevelButton.on('pointerup', () => {
-      this.nextLevelButton?.setPosition(this.nextLevelButton.x - 2, this.nextLevelButton.y - 2); // Remove shadow
-      this.nextLevel();
+    this.backButton.on('pointerdown', () => {
+      this.backButton?.setPosition(this.backButton.x + 2, this.backButton.y + 2); // Shadow effect
+    });
+
+    this.backButton.on('pointerup', () => {
+      this.backButton?.setPosition(this.backButton.x - 2, this.backButton.y - 2); // Remove shadow
+      this.scene.start('MainMenu');
     });          
+     
     
     // Add half second delay before accepting keyboard input
     this.time.delayedCall(500, () => {
 
       this.input.keyboard!.once('keydown-SPACE', () => {
-        this.nextLevel();
+       this.scene.start('MainMenu');
       });
     });
-  }
-
-  private nextLevel(): void {
-    const currentLevel = this.registry.get('level') || 0;
-    this.registry.set('level', currentLevel + 1);
-    this.scene.start('Game');
   }
 
 }
