@@ -48,16 +48,13 @@ console.log('SFX volume on main menu create:', sfxVolume);
       this.music.play();
     }
     }
-
+ 
   /**
    * Positions and (lightly) scales all UI elements based on the current game size.
    * Call this from create() and from any resize events.
    */
   private refreshLayout(): void {
     const { width, height } = this.scale;
-
-    // Resize camera to new viewport to prevent black bars
-    this.cameras.resize(width, height);
 
     this.background = this.add.image(0, 0, 'title_background').setOrigin(0);
 
