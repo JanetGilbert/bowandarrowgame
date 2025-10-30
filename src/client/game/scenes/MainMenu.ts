@@ -56,6 +56,9 @@ console.log('SFX volume on main menu create:', sfxVolume);
   private refreshLayout(): void {
     const { width, height } = this.scale;
 
+    // Check if cameras are available
+    if (!this.cameras.main) return;
+
     this.background = this.add.image(0, 0, 'title_background').setOrigin(0);
 
     // Logo – keep aspect but scale down for very small screens
