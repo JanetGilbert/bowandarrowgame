@@ -36,7 +36,7 @@ export class Settings extends Scene {
 
     const sliderTrack = this.add.rectangle(this.cameras.main.centerX, this.cameras.main.centerY - 50, 200, 10, 0x666666);
     
-    const currentVolume = this.registry.get('sfxVolume') || 1.0;
+    const currentVolume = (this.registry.get('sfxVolume') || 0.0) * 2;
     const sliderHandle = this.add.circle(this.cameras.main.centerX - 100 + (currentVolume * 200), this.cameras.main.centerY - 50, 15, 0xffffff);
     sliderHandle.setInteractive({ draggable: true });
     
@@ -49,14 +49,18 @@ export class Settings extends Scene {
       sliderHandle.x = clampedX;
       
       // Calculate volume (0.0 to 1.0)
-      const volume = (clampedX - minX) / 200;
-      this.registry.set('sfxVolume', volume);
-      this.sound.volume = volume;     
-    });
+      const volume = ((clampedX - minX) / 200)/2;
 
+      this.registry.set('sfxVolume', volume);   
+    });
+    sliderHandle.on('dragend', (pointer: any, dragX: number) => {
+      const sfxVolume = this.registry.get('sfxVolume');
+      this.sound.play('glass', { volume: sfxVolume || 0.0 });
+    });
  
+      
     // Music volume slider
-   this.musicText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 50, 'moghul_outline', `Music`, 32).setOrigin(0.5);
+    this.musicText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 50, 'moghul_outline', `Music`, 32).setOrigin(0.5);
 
     const musicSliderTrack = this.add.rectangle(this.cameras.main.centerX, this.cameras.main.centerY + 100, 200, 10, 0x666666);
     

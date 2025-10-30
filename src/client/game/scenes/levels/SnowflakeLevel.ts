@@ -57,9 +57,9 @@ export class SnowflakeLevel extends Scene {
     const scoreToAdd = Snowflake.score * arrow.multiplier;
     this.gameScene.floatScores.add(new FloatScore(this, snowflake.x, snowflake.y, scoreToAdd, 0xffffff));
     this.gameScene.addScore(scoreToAdd);
-
+    const sfxVolume = this.registry.get('sfxVolume');
     this.sound.play('glass', { 
-      volume: 0.5,
+      volume: sfxVolume || 0.0,
       rate: 1.0 + (arrow.multiplier / 100)
     });
 

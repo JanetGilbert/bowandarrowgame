@@ -7,6 +7,7 @@ export class MainMenu extends Scene {
   settingsButton: GameObjects.BitmapText | null = null;
   instructionsButton: GameObjects.BitmapText | null = null;
   copyrightText: GameObjects.Text | null = null;
+  music: Phaser.Sound.BaseSound | null = null;
 
   constructor() {
     super('MainMenu');
@@ -30,15 +31,23 @@ export class MainMenu extends Scene {
   create() {
     this.registry.set('level', 0);
     this.registry.set('score', 0);
+    const sfxVolume = this.registry.get('sfxVolume');
+console.log('SFX volume on main menu create:', sfxVolume);
+    if (sfxVolume === undefined) {
+      this.registry.set('sfxVolume', 0.5); // Default volume
+    }
+
     this.refreshLayout();
 
     // Re-calculate positions whenever the game canvas is resized (e.g. orientation change).
     this.scale.on('resize', () => this.refreshLayout());
 
     // Play background music
-    const music = this.sound.add('music', { loop: true, volume: 1.0 });
-    music.play();
-  }
+    if (!this.music) { 
+      this.music = this.sound.add('music', { loop: true, volume: 1.0 });
+      this.music.play();
+    }
+    }
 
   /**
    * Positions and (lightly) scales all UI elements based on the current game size.

@@ -86,7 +86,8 @@ export default class Bird extends Phaser.Physics.Arcade.Sprite {
   }
 
   explode() {
-    this.scene.sound.play('rustle', { volume: 0.5 });
+    const sfxVolume = this.scene.registry.get('sfxVolume');
+    this.scene.sound.play('rustle', { volume: sfxVolume || 0.0 });
 
     this.scene.add.particles(this.x, this.y, 'paper_particles', {
       quantity: 20,

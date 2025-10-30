@@ -75,10 +75,6 @@ export class Game extends Scene {
 
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
 
-    // Play background music
-    const music = this.sound.add('music', { loop: true, volume: 0.5 });
-    music.play();
-
     // Set up level 
     console.log(`Starting level: ${levelType}, phase: ${phase}`);
     this.scene.launch(levelType, { phase: phase, targets: targets });
@@ -162,5 +158,10 @@ export class Game extends Scene {
     this.scene.stop('BirdLevel');
     this.scene.stop('SnowflakeLevel');
     this.scene.stop('BallLevel');
+  }
+
+  getSFXVolume(): number {
+    console.log('Getting SFX volume:', this.registry.get('sfxVolume'));
+    return (this.registry.get('sfxVolume') || 0.0) / 2;
   }
 }

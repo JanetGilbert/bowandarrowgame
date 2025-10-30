@@ -43,8 +43,9 @@ export default class Bubble extends Phaser.Physics.Arcade.Sprite {
   }
 
   explode() {
-    this.scene.sound.play('pop2', { volume: 0.5 });
-    
+    const sfxVolume = this.scene.registry.get('sfxVolume');
+    this.scene.sound.play('pop2', { volume: sfxVolume || 0.0 });
+
     // Play bubble pop animation, then destroy when complete
     this.play('bubble_pop');
     if (this.body) {

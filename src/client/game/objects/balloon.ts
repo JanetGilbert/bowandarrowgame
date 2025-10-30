@@ -35,8 +35,10 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
   }
 
   explode() {
-    this.scene.sound.play('pop', { volume: 0.5 });
-    
+    const sfxVolume = this.scene.registry.get('sfxVolume');
+    console.log('Playing pop sound with volume:', sfxVolume);
+    this.scene.sound.play('pop', { volume: sfxVolume || 0.0 });
+
     this.scene.add.particles(this.x, this.y, 'balloon_particles', {
       quantity: 10, 
       lifespan: 200,

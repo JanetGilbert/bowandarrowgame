@@ -72,7 +72,10 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
   }
 
   explode() {
-    this.scene.sound.play('tennis', { volume: 0.5 });
+    const game = this.scene.scene.manager.game as any;
+    const sfxVolume = game.getSFXVolume ? game.getSFXVolume() : 0.0;
+    this.scene.sound.play('tennis', { volume: sfxVolume });
+    
     if (this.body) {
       this.body.enable = false;
     }
