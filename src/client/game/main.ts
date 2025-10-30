@@ -11,6 +11,8 @@ import { BubbleLevel } from './scenes/levels/BubbleLevel';
 import { BirdLevel } from './scenes/levels/BirdLevel';
 import { BallLevel } from './scenes/levels/BallLevel';
 import { SnowflakeLevel } from './scenes/levels/SnowflakeLevel';
+import { Instructions } from './scenes/Instructions';
+import { Settings } from './scenes/Settings';
 
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
@@ -36,7 +38,9 @@ const config: Phaser.Types.Core.GameConfig = {
       height: 600
     }
   },
-  scene: [Boot, Preloader, MainMenu, MainGame, LevelUp, GameOver, BalloonLevel, BubbleLevel, BirdLevel, BallLevel, SnowflakeLevel],
+  scene: [Boot, Preloader, MainMenu, MainGame, LevelUp, GameOver, 
+          BalloonLevel, BubbleLevel, BirdLevel, BallLevel, SnowflakeLevel,
+          Instructions, Settings],
 };
 
 const StartGame = (parent: string) => {

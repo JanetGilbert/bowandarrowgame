@@ -68,7 +68,6 @@ export class MainMenu extends Scene {
       this.startButton?.clearTint(); // Remove highlight
     });
 
-    // Click effects
     this.startButton.on('pointerdown', () => {
       this.startButton?.setPosition(this.startButton.x + 2, this.startButton.y + 2); // Shadow effect
     });
@@ -96,12 +95,11 @@ export class MainMenu extends Scene {
 
     this.settingsButton.on('pointerup', () => {
       this.settingsButton?.setPosition(this.settingsButton.x - 2, this.settingsButton.y - 2);
-      // TODO: Add settings scene
-      console.log('Settings clicked');
+      this.scene.start('Settings');
     });
 
     // Instructions button
-    this.instructionsButton = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 190, 'moghul_outline', 'Instructions', 36).setOrigin(0.5);
+    this.instructionsButton = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 190, 'moghul_outline', 'How to Play', 36).setOrigin(0.5);
     this.instructionsButton.setInteractive();
 
     this.instructionsButton.on('pointerover', () => {
@@ -118,19 +116,10 @@ export class MainMenu extends Scene {
 
     this.instructionsButton.on('pointerup', () => {
       this.instructionsButton?.setPosition(this.instructionsButton.x - 2, this.instructionsButton.y - 2);
-      // TODO: Add instructions scene
-      console.log('Instructions clicked');
+      this.scene.start('Instructions');
     });
 
-    // Click effects
-    this.startButton.on('pointerdown', () => {
-      this.startButton?.setPosition(this.startButton.x + 2, this.startButton.y + 2); // Shadow effect
-    });
 
-    this.startButton.on('pointerup', () => {
-      this.startButton?.setPosition(this.startButton.x - 2, this.startButton.y - 2); // Remove shadow
-      this.scene.start('Game');
-    });
 
 
     // Copyright
