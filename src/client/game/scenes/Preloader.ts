@@ -1,6 +1,9 @@
 import { Scene } from 'phaser';
 
 export class Preloader extends Scene {
+  private progressBarOutline: Phaser.GameObjects.Rectangle | null = null;
+  private progressBar: Phaser.GameObjects.Rectangle | null = null;
+
   constructor() {
     super('Preloader');
   }
@@ -15,13 +18,13 @@ export class Preloader extends Scene {
     //  A simple progress bar. This is the outline of the bar.
     const progressBarWidth = 150;
     const progressBarHeight = 30;
-    this.add.rectangle(this.cameras.main.centerX, 
+    this.progressBarOutline = this.add.rectangle(this.cameras.main.centerX, 
                       this.cameras.main.centerY + 100, 
                       progressBarWidth, 
                       progressBarHeight).setStrokeStyle(1, 0xfebfff);
 
     //  This is the progress bar itself. It will increase in size from the left based on the % of progress.
-    const bar = this.add.rectangle(this.cameras.main.centerX - (progressBarWidth/2), 
+    this.progressBar = this.add.rectangle(this.cameras.main.centerX - (progressBarWidth/2), 
                                   this.cameras.main.centerY + 100, 
                                   4, 
                                   progressBarHeight - 4, 0xffffff);
@@ -29,7 +32,17 @@ export class Preloader extends Scene {
     //  Use the 'progress' event emitted by the LoaderPlugin to update the loading bar
     this.load.on('progress', (progress: number) => {
       //  Update the progress bar 
-      bar.width = 4 + (progressBarWidth - 4) * progress;
+      if (this.progressBar) {
+        this.progressBar.width = 4 + (progressBarWidth - 4) * progress;
+      }
+      
+      // Hide progress bar when complete
+      if (progress >= 1.0) {
+        if (this.progressBarOutline) this.progressBarOutline.setVisible(false);
+        if (this.progressBar) this.progressBar.setVisible(false);
+
+        this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 200, 'moghul_outline', 'Tap or Space', 32).setOrigin(0.5);
+      }
     });
   }
 
@@ -78,7 +91,15 @@ export class Preloader extends Scene {
     //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
     //  For example, you can define global animations here, so we can use them in other scenes.
 
-    //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-    this.scene.start('MainMenu');
+ 
+    // Handle spacebar
+    this.input.keyboard!.on('keydown-SPACE', () => {
+      this.scene.start('MainMenu');
+    });
+    
+    // Also handle any general tap on the screen
+    this.input.on('pointerup', () => {
+      this.scene.start('MainMenu');
+    });
   }
 }
