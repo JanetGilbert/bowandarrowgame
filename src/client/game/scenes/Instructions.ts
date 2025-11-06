@@ -68,11 +68,11 @@ export class Instructions extends Scene {
     this.instructionsText6 = this.add.bitmapText(this.cameras.main.centerX, 350, 'moghul_outline', 
                               'Tap and release to fire arrow', 24).setOrigin(0.5);
 
-    this.instructionsText7 = this.add.bitmapText(this.cameras.main.centerX, 400, 'moghul_outline', 
+    /*this.instructionsText7 = this.add.bitmapText(this.cameras.main.centerX, 400, 'moghul_outline', 
                               'Keyboard controls:', 24).setOrigin(0.5);
 
     this.instructionsText8 = this.add.bitmapText(this.cameras.main.centerX, 430, 'moghul_outline', 
-                              '[Q] Left, [E] Right, [Space] Fire', 24).setOrigin(0.5);
+                              '[Q] Left, [E] Right, [Space] Fire', 24).setOrigin(0.5);*/
 
      // Back button
     this.backButton = this.add.bitmapText(this.cameras.main.centerX, 530, 'coffee_spark', 'Main Menu', 48).setOrigin(0.5);

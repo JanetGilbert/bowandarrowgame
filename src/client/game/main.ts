@@ -44,7 +44,28 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 const StartGame = (parent: string) => {
-  return new Game({ ...config, parent });
+  const game = new Game({ ...config, parent });
+  
+  // Handle audio resumption after phone calls or app backgrounding
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      // User returned to the app, resume audio context if needed
+      const soundManager = game.sound as Phaser.Sound.WebAudioSoundManager;
+      if (soundManager.context && soundManager.context.state === 'suspended') {
+        soundManager.context.resume();
+      }
+    }
+  });
+  
+  // Also handle focus events for additional coverage
+  window.addEventListener('focus', () => {
+    const soundManager = game.sound as Phaser.Sound.WebAudioSoundManager;
+    if (soundManager.context && soundManager.context.state === 'suspended') {
+      soundManager.context.resume();
+    }
+  });
+  
+  return game;
 };
 
 export default StartGame;
