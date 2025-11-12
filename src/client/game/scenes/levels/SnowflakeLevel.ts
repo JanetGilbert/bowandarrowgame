@@ -99,8 +99,15 @@ export class SnowflakeLevel extends Scene {
       }
     }
     else {
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < this.gameScene.targetsRemaining; i++) {
         this.addSwirlingSnowflake();
+      }
+console.log('Snowflakes added:', this.snowflakes.children.size, "targetsRemaining:", this.gameScene.targetsRemaining);
+      if (this.snowflakes.children.size < this.gameScene.targetsRemaining) {
+        this.gameScene.targetsRemaining = this.snowflakes.children.size;
+        this.gameScene.refreshUI();
+        console.log('corrected Snowflakes added:', this.snowflakes.children.size, "targetsRemaining:", this.gameScene.targetsRemaining);
+
       }
     }
   }
@@ -109,9 +116,9 @@ export class SnowflakeLevel extends Scene {
     var overlapping = true;
     var tries = 0;
 
-    while (overlapping && tries < 10  ) {
+    while (overlapping && tries < 20  ) {
       tries++;
-      const x = Phaser.Math.Between(0, this.cameras.main.width);
+      const x = Phaser.Math.Between(75, this.cameras.main.width-75);
       const y = Phaser.Math.Between(50, 400);
 
       const newSnowflake = this.snowflakes.create(x, y, 'snowflake');
@@ -139,7 +146,7 @@ export class SnowflakeLevel extends Scene {
     var tries = 0;
 
     while (overlapping && tries < 10  ) {
-      const x = Phaser.Math.Between(0, this.cameras.main.width);  
+      const x = Phaser.Math.Between(75, this.cameras.main.width-75);  
       const newSnowflake = this.snowflakes.create(x, y, 'snowflake');
       if (newSnowflake==null){
         return null;

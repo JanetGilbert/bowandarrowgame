@@ -10,7 +10,11 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.swirlingRotation = Phaser.Math.FloatBetween(-50, 50);
-    this.swirlingSpeed = Phaser.Math.FloatBetween(40, 60);
+    this.swirlingSpeed = Phaser.Math.FloatBetween(10, 40);
+    // Reverse speed on coin flip
+    if (Phaser.Math.Between(0, 1) === 0) {
+      this.swirlingSpeed = -this.swirlingSpeed;
+    }
 
     // Scale randomly between half and full size
     const scale = Phaser.Math.FloatBetween(0.5, 1.0);

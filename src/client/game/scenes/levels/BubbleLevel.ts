@@ -114,7 +114,7 @@ export class BubbleLevel extends Scene {
 
     while (overlapping && tries < 20  ) {
       tries++;
-      const x = Phaser.Math.Between(50, this.cameras.main.width-50);
+      const x = Phaser.Math.Between(25, this.cameras.main.width-25);
       const y = Phaser.Math.Between(50, 500);
       const newBubble = this.bubbles.create(x, y, 'bubble');
       overlapping = this.physics.overlap(newBubble, this.bubbles);
