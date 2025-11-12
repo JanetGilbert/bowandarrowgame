@@ -125,7 +125,6 @@ export class BubbleLevel extends Scene {
         return newBubble;
       }
     }
-    console.log("Failed to add bubble", this.bubbles.children.size, "after", tries, "tries");
     return null;
 
   }

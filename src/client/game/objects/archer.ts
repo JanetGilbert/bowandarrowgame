@@ -86,7 +86,6 @@ export default class Archer extends Phaser.GameObjects.Sprite {
       this.isDragging = true;
       this.dragStartX = pointer.x;
       this.archerStartX = this.x;
-      console.log("arrow active: " + this.arrow.active);
       if (!this.arrow.active) {
           this.setArcherState(ArcherState.BowDraw);
       }
@@ -128,12 +127,10 @@ export default class Archer extends Phaser.GameObjects.Sprite {
    this.scene.input.on('pointerupoutside', (pointer: Phaser.Input.Pointer) => {
       if (this.isDragging) {
         this.isDragging = false;
-        console.log('Pointer released outside the game canvas');
       }
     });
 
     document.addEventListener('mouseleave', (event) => {
-      console.log('mouse leave');
       this.isDragging = false;
     });
   }
@@ -141,7 +138,7 @@ export default class Archer extends Phaser.GameObjects.Sprite {
   setArcherState(newState: ArcherState) {
     if (this.currentState !== newState) {
       const oldState = this.currentState;
-      console.log('State change:', ArcherState[this.currentState], '->', ArcherState[newState]);
+     // console.log('State change:', ArcherState[this.currentState], '->', ArcherState[newState]);
       this.currentState = newState; 
       switch (newState) {
         case ArcherState.Idle:

@@ -11,7 +11,7 @@ export default class GameLevels {
     { type: 'SnowflakeLevel', phase: 0, arrows: 8, targets: 30}, // 6
     { type: 'SnowflakeLevel', phase: 1, arrows: 11, targets: 20}, // 7
     { type: 'BallLevel', phase: 0, arrows: 8, targets: 15}, // 8
-    { type: 'BallLevel', phase: 1, arrows: 12, targets: 15}, // 9
+    { type: 'BallLevel', phase: 1, arrows: 10, targets: 15}, // 9
   ];
 
 

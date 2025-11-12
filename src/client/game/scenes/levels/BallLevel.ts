@@ -78,7 +78,6 @@ export class BallLevel extends Scene {
   addBalls() {
     if (this.phase === 0){
      for (let i = 0; i < 20; i++) {
-      console.log('Adding ball', i);
         const x = Phaser.Math.Between(0, this.cameras.main.width);
         const y = Phaser.Math.Between(50, 400);
         const newBall = this.balls.create(x, y, 'ball');

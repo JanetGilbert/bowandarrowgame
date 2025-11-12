@@ -4,6 +4,12 @@ import Archer from '@objects/archer.js';
 import FloatScore from '@objects/floatscore.js';
 import GameLevels from '@game/utility/constants.js';
 
+/* 
+  Todo:
+  Keyboard controls
+  Score graphics
+*/
+
 export class Game extends Scene {
   static readonly DEBUGGING: boolean = false;
   static readonly CHEAT: boolean = true;
@@ -158,10 +164,5 @@ export class Game extends Scene {
     this.scene.stop('BirdLevel');
     this.scene.stop('SnowflakeLevel');
     this.scene.stop('BallLevel');
-  }
-
-  getSFXVolume(): number {
-    console.log('Getting SFX volume:', this.registry.get('sfxVolume'));
-    return (this.registry.get('sfxVolume') || 0.0) / 2;
   }
 }
