@@ -25,10 +25,10 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
       case 0: scale = 0.5; break;
       case 1: scale = 0.7; break;
       case 2: scale = 0.8; break;
-      case 3: scale = 1.0; break;
-      case 4: scale = 0.4; break;
+      case 3: scale = 0.4; break;
+      case 4: scale = 0.5; break;
       case 5: scale = 0.8; break;
-      case 6: scale = 0.5; break;
+      case 6: scale = 1.0; break;
     }
     this.setScale(scale);
 
@@ -61,12 +61,12 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
 
     switch (this.frameNumber) {
       case 0: return 0xCDFF21; // Yellow
-      case 1: return 0x408FD7; // Blue
+      case 1: return 0xE31010; // Red
       case 2: return 0xAAAAAA; // Grey
-      case 3: return 0xF68D22; // Orange
-      case 4: return 0xFFFFFF; // White 
-      case 5: return 0x3177c7; // Blue
-      case 6: return 0xffffff; // White
+      case 3: return 0xFFFFFF; // White
+      case 4: return 0xFFFFFF; // White
+      case 5: return 0xDD7C35; // Orange
+      case 6: return 0x3177c7; // Blue
     }
     return 0xffffff;
   }
@@ -74,6 +74,7 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
   explode() {
     const game = this.scene.scene.manager.game as any;
     const sfxVolume = game.getSFXVolume ? game.getSFXVolume() : 0.0;
+    console.log('Ball explode SFX volume:', sfxVolume);
     this.scene.sound.play('tennis', { volume: sfxVolume });
     
     if (this.body) {

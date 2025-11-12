@@ -102,12 +102,9 @@ export class SnowflakeLevel extends Scene {
       for (let i = 0; i < this.gameScene.targetsRemaining; i++) {
         this.addSwirlingSnowflake();
       }
-console.log('Snowflakes added:', this.snowflakes.children.size, "targetsRemaining:", this.gameScene.targetsRemaining);
       if (this.snowflakes.children.size < this.gameScene.targetsRemaining) {
         this.gameScene.targetsRemaining = this.snowflakes.children.size;
         this.gameScene.refreshUI();
-        console.log('corrected Snowflakes added:', this.snowflakes.children.size, "targetsRemaining:", this.gameScene.targetsRemaining);
-
       }
     }
   }

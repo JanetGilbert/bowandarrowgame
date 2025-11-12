@@ -29,7 +29,7 @@ export class MainMenu extends Scene {
   }
 
   create() {
-    this.registry.set('level', 7);
+    this.registry.set('level', 8);
     this.registry.set('score', 0);
     const sfxVolume = this.registry.get('sfxVolume');
 
