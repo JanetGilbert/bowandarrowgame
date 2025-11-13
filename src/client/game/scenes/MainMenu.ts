@@ -65,7 +65,7 @@ export class MainMenu extends Scene {
    // const scaleFactor = Math.min(width / 1024, height / 768);
 
     // Title
-    this.title = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'coffee_spark', 'ZenArcher', 64).setOrigin(0.5);
+    this.title = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'coffee_spark', 'ZenCrossbow', 64).setOrigin(0.5);
 
 
     // Start button

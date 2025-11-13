@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "bowandarrowgame",
+  "name": "zencrossbow",
   "post": {
     "dir": "dist/client",
     "entrypoints": {
@@ -20,7 +20,7 @@
     "items": [
       {
         "label": "Create a new post",
-        "description": "bowandarrowgame",
+        "description": "zencrossbow",
         "location": "subreddit",
         "forUserType": "moderator",
         "endpoint": "/internal/menu/post-create"
@@ -31,6 +31,6 @@
     "onAppInstall": "/internal/on-app-install"
   },
   "dev": {
-    "subreddit": "bowandarrowgame_dev"
+    "subreddit": "zencrossbow_dev"
   }
 }

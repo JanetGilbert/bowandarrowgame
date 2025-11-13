@@ -27,7 +27,7 @@ router.get<{ postId: string }, InitResponse | { status: string; message: string 
       });
       return;
     }
-
+ 
     try {
       const count = await redis.get('count');
       res.json({
