@@ -13,7 +13,8 @@ export class Preloader extends Scene {
     this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'title_background');
 
     // Ttle
-    this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'coffee_spark', 'ZenArcher', 64).setOrigin(0.5);
+    this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'coffee_spark', 'Zen', 64).setOrigin(0.5);
+    this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 150, 'coffee_spark', 'Crossbow', 64).setOrigin(0.5);
 
     //  A simple progress bar. This is the outline of the bar.
     const progressBarWidth = 150;
