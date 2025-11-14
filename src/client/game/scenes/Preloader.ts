@@ -42,7 +42,7 @@ export class Preloader extends Scene {
         if (this.progressBarOutline) this.progressBarOutline.setVisible(false);
         if (this.progressBar) this.progressBar.setVisible(false);
 
-        this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 200, 'moghul_outline', 'Tap or Space', 32).setOrigin(0.5);
+        this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 200, 'moghul_outline', 'Tap or Click', 32).setOrigin(0.5);
       }
     });
   }
