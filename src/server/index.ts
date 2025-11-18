@@ -1,6 +1,6 @@
 import express from 'express';
-import { InitResponse, IncrementResponse, DecrementResponse, PostScoreRequest, PostScoreResponse, GetHighScoresResponse, HighScoreEntry } from '../shared/types/api';
-import { redis, createServer, context } from '@devvit/web/server';
+import { InitResponse, PostScoreRequest, PostScoreResponse, GetHighScoresResponse, HighScoreEntry } from '../shared/types/api';
+import { redis, createServer, context, reddit } from '@devvit/web/server';
 import { createPost } from './core/post';
 
 const app = express();
@@ -151,6 +151,23 @@ router.get<unknown, GetHighScoresResponse | { status: string; message: string }>
     }
   }
 );
+
+router.get<unknown, { username: string } | { status: string; message: string }>(
+  '/api/user',
+  async (_req, res): Promise<void> => {
+    try {
+      const [username] = await Promise.all([
+        reddit.getCurrentUsername()
+      ]);
+
+      res.json({ username: username || 'Anonymous' });
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      res.json({ username: 'Anonymous' });
+    }
+  }
+);
+
 
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {

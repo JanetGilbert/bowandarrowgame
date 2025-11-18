@@ -28,7 +28,7 @@ export class GameOver extends Scene {
     this.highScoreText = null;
   }
 
-  create() {
+  async create() {
     // Configure camera
     this.camera = this.cameras.main;
 
@@ -36,18 +36,34 @@ export class GameOver extends Scene {
       this.background = this.add.image(0, 0, 'title_background').setOrigin(0);
     }
 
-    this.gameOverText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 
+    this.gameOverText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 220, 
                                         'coffee_spark', 'Game Over!', 64).setOrigin(0.5);
 
-
-    this.finalScoreText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 100, 
+    this.finalScoreText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 140, 
                                           'moghul_outline', `Final Score: ${this.finalScore}`, 32).setOrigin(0.5);
 
-    this.highScoreText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 50, 
-    'moghul_outline',  `High Score: ${this.highScore}`, 32).setOrigin(0.5);
-
+    // Fetch and display high scores
+    try {
+      const response = await fetch('/api/fetch-highscores');
+      const data = await response.json();
+      
+      if (data.type === 'high-scores') {
+        const startY = this.cameras.main.centerY;
+        
+        this.add.bitmapText(this.cameras.main.centerX, startY - 60, 
+                          'moghul_outline', 'Top Scores', 28).setOrigin(0.5);
+        
+        data.scores.forEach((entry: { name: string; score: number }, index: number) => {
+          const yPos = startY -20 + (index * 30);
+          this.add.bitmapText(this.cameras.main.centerX, yPos, 
+                            'moghul_outline', `${index + 1}. ${entry.name}: ${entry.score}`, 24).setOrigin(0.5);
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch high scores:', error);
+    }
      // Main Menu button
-    this.mainMenuButton = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.height - 100, 'coffee_spark', 'Main Menu', 64).setOrigin(0.5);
+    this.mainMenuButton = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.height - 80, 'coffee_spark', 'Main Menu', 64).setOrigin(0.5);
     this.mainMenuButton.setInteractive();
 
     this.mainMenuButton.on('pointerover', () => {

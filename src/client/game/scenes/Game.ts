@@ -18,7 +18,8 @@ export class Game extends Scene {
   targetsRemaining: number;
   arrowsRemaining: number;
   highScore: number = 0;
-  
+  username: string = '';
+
   // Game objects
   archer: Archer;
   floatScores: Phaser.GameObjects.Group;
@@ -32,8 +33,16 @@ export class Game extends Scene {
     super('Game');
   }
 
-  init() {
-   
+  async init() {
+    // Get username from Reddit context
+    try {
+      const userResponse = await fetch('/api/user');
+      const userData = await userResponse.json();
+      this.username = userData.username;
+    } catch (error) {
+      console.error('Failed to fetch username:', error);
+    }
+    console.log(`Username: ${this.username}`);
 
   }
 
@@ -150,11 +159,28 @@ export class Game extends Scene {
     this.targetsText.setText(this.targetsRemaining.toString());
   } 
  
-  gameOver() {
+  async gameOver() {
     this.removeScenes();
+
+    console.log(`Game Over! Final Score: ${this.getScore()} ${this.username}`);  
+    if (this.username !== 'Anonymous') {
+      // Post the high score
+      try {
+        await fetch('/api/post-highscore', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: this.username,
+            score: this.getScore()
+          })
+        });
+      } catch (error) {
+        console.error('Failed to post high score:', error);
+      }
+    }
+
     this.scene.start('GameOver', { 
-      score: this.getScore(), 
-      highScore: this.getHighScore() 
+      score: this.getScore()
     });
   }
 
