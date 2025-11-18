@@ -1,5 +1,5 @@
 import express from 'express';
-import { InitResponse, IncrementResponse, DecrementResponse } from '../shared/types/api';
+import { InitResponse, IncrementResponse, DecrementResponse, PostScoreRequest, PostScoreResponse, GetHighScoresResponse, HighScoreEntry } from '../shared/types/api';
 import { redis, createServer, context } from '@devvit/web/server';
 import { createPost } from './core/post';
 
@@ -45,7 +45,7 @@ router.get<{ postId: string }, InitResponse | { status: string; message: string 
     }
   }
 );
-
+/*
 router.post<{ postId: string }, IncrementResponse | { status: string; message: string }, unknown>(
   '/api/increment',
   async (_req, res): Promise<void> => {
@@ -83,6 +83,72 @@ router.post<{ postId: string }, DecrementResponse | { status: string; message: s
       postId,
       type: 'decrement',
     });
+  }
+);*/
+
+// High Score endpoints
+const HIGH_SCORE_KEY = 'zencrossbow:highscores';
+
+router.post<unknown, PostScoreResponse | { status: string; message: string }, PostScoreRequest>(
+  '/api/post-highscore',
+  async (req, res): Promise<void> => {
+    try {
+      const { name, score } = req.body;
+
+      if (!name || typeof score !== 'number') {
+        res.status(400).json({
+          status: 'error',
+          message: 'Name and score are required',
+        });
+        return;
+      }
+
+      // Add score to sorted set (higher scores get higher rank)
+      // Use name as member, score as the score value
+      // If name exists, update with new score only if higher
+      const existingScore = await redis.zScore(HIGH_SCORE_KEY, name);
+      
+      if (!existingScore || score > existingScore) {
+        await redis.zAdd(HIGH_SCORE_KEY, { member: name, score });
+      }
+
+      res.json({
+        type: 'post-score',
+        success: true,
+      });
+    } catch (error) {
+      console.error('Error posting high score:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to post high score',
+      });
+    }
+  }
+);
+
+router.get<unknown, GetHighScoresResponse | { status: string; message: string }>(
+  '/api/fetch-highscores',
+  async (_req, res): Promise<void> => {
+    try {
+      // Get top 5 scores (reverse order - highest first)
+      const topScores = await redis.zRange(HIGH_SCORE_KEY, 0, 4, { reverse: true, by: 'rank' });
+
+      const scores: HighScoreEntry[] = topScores.map((entry) => ({
+        name: entry.member,
+        score: entry.score,
+      }));
+
+      res.json({
+        type: 'high-scores',
+        scores,
+      });
+    } catch (error) {
+      console.error('Error fetching high scores:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to fetch high scores',
+      });
+    }
   }
 );
 
