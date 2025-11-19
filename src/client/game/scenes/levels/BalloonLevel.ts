@@ -5,9 +5,9 @@ import Balloon from '@objects/balloon.js';
 import FloatScore from '@objects/floatscore.js';
 
 export class BalloonLevel extends Scene {
-  private balloons: Phaser.GameObjects.Group;
+  public balloons: Phaser.GameObjects.Group;
   private gameScene: Game;
-  private phase: number;
+  public phase: number;
 
   constructor() {
     super('BalloonLevel');
@@ -80,7 +80,6 @@ export class BalloonLevel extends Scene {
         const x = Phaser.Math.Between(0, this.cameras.main.width);
         const y = Phaser.Math.Between(50, 400);
         const newBalloon = this.balloons.create(x, y, 'balloon');
-        newBalloon.setVelocityX(Phaser.Math.FloatBetween(40, 60));
         const overlapping = this.physics.overlap(newBalloon, this.balloons);
         if (overlapping) {
           newBalloon.destroy(); // Remove and try again
@@ -97,7 +96,6 @@ export class BalloonLevel extends Scene {
       const x = Phaser.Math.Between(-50, 0);
       const y = Phaser.Math.Between(50, 400);
       const newBalloon = this.balloons.create(x, y, 'balloon');
-      newBalloon.setVelocityX(Phaser.Math.FloatBetween(40, 60));
       overlapping = this.physics.overlap(newBalloon, this.balloons);
       if (overlapping) {
         newBalloon.destroy(); // Remove and try again

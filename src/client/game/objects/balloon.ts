@@ -1,7 +1,10 @@
+import { BalloonLevel } from "@game/scenes/levels/BalloonLevel";
+
 export default class Balloon extends Phaser.Physics.Arcade.Sprite {
   private variance: number = 0.1;
   private oscillate: number = 0.002;
   static readonly score = 1;
+  private readonly phase: number = (this.scene as BalloonLevel).phase;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'balloon');
@@ -9,7 +12,7 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
     this.oscillate = Phaser.Math.FloatBetween(0.0005, 0.0007);
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setVelocityX(Phaser.Math.FloatBetween(50, 55));
+    
     this.setTint(Phaser.Math.RND.pick([0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff]));
     
     // Set smaller, centered circular body
@@ -18,6 +21,17 @@ export default class Balloon extends Phaser.Physics.Arcade.Sprite {
       this.body.setOffset(this.width / 2 - 15, this.height / 2 - 15); // Center the circle
       (this.body as Phaser.Physics.Arcade.Body).debugShowBody = true;
     }
+
+    // Working around a bug by delaying setting velocity until the body is definitely initialized
+    this.scene.time.delayedCall(10, () => {
+      if (this.active && this.body) {
+        if (this.phase === 0) {
+          this.setVelocityX(Phaser.Math.FloatBetween(50, 55));
+        } else {
+          this.setVelocityX(Phaser.Math.FloatBetween(40, 60));
+        }
+      }
+    });
   }
 
   override update() {
