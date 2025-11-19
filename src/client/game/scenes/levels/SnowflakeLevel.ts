@@ -118,13 +118,11 @@ export class SnowflakeLevel extends Scene {
       const x = Phaser.Math.Between(75, this.cameras.main.width-75);
       const y = Phaser.Math.Between(50, 400);
 
-      const newSnowflake = this.snowflakes.create(x, y, 'snowflake');
+      const newSnowflake = new Snowflake(this, x, y, this.phase, 0, 0);
 
       if (newSnowflake==null){
         return null;
       }
-
-      newSnowflake.setPhase(this.phase);
 
       overlapping = this.physics.overlap(newSnowflake, this.snowflakes);
       tries++;
@@ -132,6 +130,7 @@ export class SnowflakeLevel extends Scene {
         newSnowflake.destroy(); // Remove and try again
       }
       else{
+        this.snowflakes.add(newSnowflake);
         return newSnowflake;
       }
     }
@@ -144,20 +143,25 @@ export class SnowflakeLevel extends Scene {
 
     while (overlapping && tries < 10  ) {
       const x = Phaser.Math.Between(75, this.cameras.main.width-75);  
-      const newSnowflake = this.snowflakes.create(x, y, 'snowflake');
+      const velocityX = Phaser.Math.FloatBetween(-20, 20);
+      const velocityY = Phaser.Math.FloatBetween(40, 80);
+      const newSnowflake = new Snowflake(this, x, y, this.phase, velocityX, velocityY);
       if (newSnowflake==null){
         return null;
       }
+      
+
       overlapping = this.physics.overlap(newSnowflake, this.snowflakes);
       tries++;
-      if (overlapping) {
-        newSnowflake.destroy(); // Remove and try again
+      if (overlapping){
+        newSnowflake.destroy();
       }
       else{
-          newSnowflake.setVelocityX(Phaser.Math.FloatBetween(-20, 20));
-          newSnowflake.setVelocityY(Phaser.Math.FloatBetween(40, 80));
+        this.snowflakes.add(newSnowflake);
         return newSnowflake;
       }
+
+     
     }
     return null;
 

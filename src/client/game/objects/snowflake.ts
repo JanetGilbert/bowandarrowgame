@@ -5,16 +5,13 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
   private swirlingSpeed: number = 0;
   private phase: number = 0;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, phase: number, velocityX: number = 0, velocityY: number = 0) {
     super(scene, x, y, 'snowflake');
+    this.phase = phase;
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.swirlingRotation = Phaser.Math.FloatBetween(-50, 50);
-    this.swirlingSpeed = Phaser.Math.FloatBetween(10, 40);
-    // Reverse speed on coin flip
-    if (Phaser.Math.Between(0, 1) === 0) {
-      this.swirlingSpeed = -this.swirlingSpeed;
-    }
+
+
 
     // Scale randomly between half and full size
     const scale = Phaser.Math.FloatBetween(0.5, 1.0);
@@ -31,10 +28,22 @@ export default class Snowflake extends Phaser.Physics.Arcade.Sprite {
     }
 
     this.createAnimations();
-  }
-
-  setPhase(phase: number) {
-    this.phase = phase;
+    
+    if (this.phase === 0) {
+      // Working around a bug by delaying setting velocity until the body is definitely initialized
+      this.scene.time.delayedCall(10, () => {
+        if (this.active && this.body) {
+          this.setVelocity(velocityX, velocityY);
+        }
+      });
+    }
+    else if (this.phase === 1) {  
+      this.swirlingRotation = Phaser.Math.FloatBetween(-50, 50);
+      this.swirlingSpeed = Phaser.Math.FloatBetween(10, 40);
+      if (Phaser.Math.Between(0, 1) === 0) {
+        this.swirlingSpeed = -this.swirlingSpeed;
+      }
+    }
   }
 
   override update() {
