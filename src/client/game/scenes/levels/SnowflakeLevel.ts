@@ -93,7 +93,7 @@ export class SnowflakeLevel extends Scene {
   addSnowflakes() {
 
     if (this.phase === 0){
-      for (let i = 0; i < this.snowflakes.maxSize; i++) {
+      for (let i = 0; i < 30; i++) {
         const y = Phaser.Math.Between(50, 400);
         this.addRandomSnowflake(y);
       }
