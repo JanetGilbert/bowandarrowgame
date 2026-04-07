@@ -11,14 +11,10 @@ export const createPost = async () => {
 
   console.log('About to call submitCustomPost...');
   return await reddit.submitCustomPost({
-    splash: {
-      // Splash screen customization
-      appDisplayName: 'ZenCrossbow',
-      backgroundUri: 'default-splash.png',
-      buttonLabel: 'Start Playing',
-      description: 'A chilltastic archery game',
-      heading: 'ZenCrossbow',
-      appIconUri: 'default-icon.png',
+    styles: {
+      backgroundColor: '#FFFFFFFF',
+      backgroundColorDark: '#1A1A1BFF',
+      height: 'REGULAR',
     },
     postData: {
       gameState: 'initial',
