@@ -16,6 +16,10 @@ export default defineConfig(({ mode }) => {
       sourcemap: true,
       chunkSizeWarningLimit: 1500,
       rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'index.html'),
+          preview: path.resolve(__dirname, 'preview.html'),
+        },
         output: {
           manualChunks: {
             phaser: ['phaser'],
