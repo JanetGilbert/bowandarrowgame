@@ -11,11 +11,6 @@ export const createPost = async () => {
 
   console.log('About to call submitCustomPost...');
   return await reddit.submitCustomPost({
-    styles: {
-      backgroundColor: '#FFFFFFFF',
-      backgroundColorDark: '#1A1A1BFF',
-      height: 'REGULAR',
-    },
     postData: {
       gameState: 'initial',
       score: 0,
