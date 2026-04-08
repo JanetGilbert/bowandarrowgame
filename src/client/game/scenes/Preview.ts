@@ -63,8 +63,8 @@ export class Preview extends Scene {
 
       this.balloons.push({
         image,
-        speed: Phaser.Math.FloatBetween(30, 55),
-        variance: Phaser.Math.FloatBetween(0.3, 0.6),
+        speed: Phaser.Math.FloatBetween(15, 30),
+        variance: Phaser.Math.FloatBetween(0.06, 0.1),
         oscillate: Phaser.Math.FloatBetween(0.001, 0.002),
       });
     }
