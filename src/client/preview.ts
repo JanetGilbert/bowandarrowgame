@@ -8,10 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     parent: 'preview-container',
     backgroundColor: '#000000',
     scale: {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: 400,
-      height: 320,
+      mode: Phaser.Scale.RESIZE,
+      width: '100%',
+      height: '100%',
     },
     scene: [PreviewBoot, Preview],
   });

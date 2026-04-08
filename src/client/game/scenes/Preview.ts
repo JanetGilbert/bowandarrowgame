@@ -26,8 +26,9 @@ export class Preview extends Scene {
     const cx = width / 2;
 
     // Background
-    this.add.image(cx, height / 2, 'title_background').setOrigin(0.5);
-
+    const bg = this.add.image(cx, height / 2, 'splash_background').setOrigin(0.5);
+    const scale = Math.max(width / bg.width, height / bg.height);
+    bg.setScale(scale);
     // Spawn decorative balloons behind text
     this.spawnBalloons();
 
@@ -47,6 +48,23 @@ export class Preview extends Scene {
     // Fetch data — username must resolve before high scores (used for rank display)
     await this.fetchUserData();
     this.fetchHighScores();
+
+    this.scale.on('resize', (gameSize: Phaser.Structs.Size) => {
+      const newCx = gameSize.width / 2;
+      const newCy = gameSize.height / 2;
+
+      // Reposition background
+      bg.setPosition(newCx, newCy);
+      const s = Math.max(gameSize.width / bg.width, gameSize.height / bg.height);
+      bg.setScale(s);
+
+      // Reposition all centered elements
+      this.children.each((child: Phaser.GameObjects.GameObject) => {
+        if (child instanceof Phaser.GameObjects.BitmapText) {
+          child.setX(newCx);
+        }
+      });
+    });
   }
 
   private spawnBalloons() {
