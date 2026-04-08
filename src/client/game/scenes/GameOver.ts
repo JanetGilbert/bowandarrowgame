@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import * as Phaser from 'phaser';
+import type { HighScoreEntry, UserRankResponse } from '../../../shared/types/api.js';
 
 export class GameOver extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
@@ -42,26 +43,9 @@ export class GameOver extends Scene {
     this.finalScoreText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 140, 
                                           'moghul_outline', `Final Score: ${this.finalScore}`, 32).setOrigin(0.5);
 
-    // Fetch and display high scores
-    try {
-      const response = await fetch('/api/fetch-highscores');
-      const data = await response.json();
-      
-      if (data.type === 'high-scores') {
-        const startY = this.cameras.main.centerY;
-        
-        this.add.bitmapText(this.cameras.main.centerX, startY - 60, 
-                          'moghul_outline', 'Top Scores', 28).setOrigin(0.5);
-        
-        data.scores.forEach((entry: { name: string; score: number }, index: number) => {
-          const yPos = startY -20 + (index * 30);
-          this.add.bitmapText(this.cameras.main.centerX, yPos, 
-                            'moghul_outline', `${index + 1}. ${entry.name}: ${entry.score}`, 24).setOrigin(0.5);
-        });
-      }
-    } catch (error) {
-      console.error('Failed to fetch high scores:', error);
-    }
+    // Fetch and display high scores with user rank
+    await this.fetchAndDisplayScores();
+
      // Main Menu button
     this.mainMenuButton = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.height - 80, 'coffee_spark', 'Main Menu', 64).setOrigin(0.5);
     this.mainMenuButton.setInteractive();
@@ -90,6 +74,55 @@ export class GameOver extends Scene {
          this.scene.start('MainMenu');
       });
     });
+  }
+
+  private async fetchAndDisplayScores() {
+    const cx = this.cameras.main.centerX;
+    let scores: HighScoreEntry[] = [];
+    let userRank: UserRankResponse = { type: 'user-rank', rank: null, score: null };
+
+    try {
+      const [scoresRes, rankRes] = await Promise.all([
+        fetch('/api/fetch-highscores'),
+        fetch('/api/user-rank'),
+      ]);
+      const scoresData = await scoresRes.json();
+      scores = scoresData.scores ?? [];
+      userRank = await rankRes.json();
+    } catch (error) {
+      console.error('Failed to fetch high scores:', error);
+      return;
+    }
+
+    const startY = this.cameras.main.centerY - 60;
+    this.add.bitmapText(cx, startY, 'moghul_outline', 'Top Scores', 28).setOrigin(0.5);
+
+    const lineHeight = 30;
+    const totalLines = 5;
+    const listStartY = startY + 40;
+
+    // Check if the current user is already in the top 5
+    const userInTop5 = userRank.rank !== null && userRank.rank <= totalLines;
+    const showUserInLast = !userInTop5 && userRank.rank !== null && userRank.score !== null;
+    const topSlots = showUserInLast ? totalLines - 1 : totalLines;
+
+    // Display top scores
+    for (let i = 0; i < topSlots; i++) {
+      const label = i < scores.length
+        ? `${i + 1}. ${scores[i]!.name}: ${scores[i]!.score}`
+        : `${i + 1}. ----------`;
+      this.add.bitmapText(cx, listStartY + i * lineHeight, 'moghul_outline', label, 24).setOrigin(0.5);
+    }
+
+    // If user is outside top 5, show their rank in the last row
+    if (showUserInLast) {
+      this.add.bitmapText(
+        cx, listStartY + (totalLines - 1) * lineHeight,
+        'moghul_outline',
+        `${userRank.rank}. ${userRank.score}  (You)`,
+        24
+      ).setOrigin(0.5);
+    }
   }
 
   
