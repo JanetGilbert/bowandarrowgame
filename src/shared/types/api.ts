@@ -35,3 +35,9 @@ export type GetHighScoresResponse = {
   type: 'high-scores';
   scores: HighScoreEntry[];
 };
+
+export type UserRankResponse = {
+  type: 'user-rank';
+  rank: number | null;
+  score: number | null;
+};

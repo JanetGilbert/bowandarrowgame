@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import type { HighScoreEntry } from '../../../shared/types/api.js';
+import type { HighScoreEntry, UserRankResponse } from '../../../shared/types/api.js';
 
 interface PreviewBalloon {
   image: Phaser.GameObjects.Image;
@@ -21,7 +21,7 @@ export class Preview extends Scene {
     super('Preview');
   }
 
-  create() {
+  async create() {
     const { width, height } = this.scale;
     const cx = width / 2;
 
@@ -44,8 +44,8 @@ export class Preview extends Scene {
     // "No scores yet" placeholder (hidden once scores load)
     this.noScoresText = this.add.bitmapText(cx, 180, 'moghul', 'Loading...', 14).setOrigin(0.5).setDepth(1);
 
-    // Fetch data
-    this.fetchUserData();
+    // Fetch data — username must resolve before high scores (used for rank display)
+    await this.fetchUserData();
     this.fetchHighScores();
   }
 
@@ -101,10 +101,18 @@ export class Preview extends Scene {
   }
 
   private async fetchHighScores() {
+    let userRank: UserRankResponse = { type: 'user-rank', rank: null, score: null };
+
     try {
-      const res = await fetch('/api/fetch-highscores');
-      const data = await res.json();
-      this.scores = data.scores ?? [];
+      const [scoresRes, rankRes] = await Promise.all([
+        fetch('/api/fetch-highscores'),
+        this.username !== 'Anonymous' ? fetch('/api/user-rank') : null,
+      ]);
+      const scoresData = await scoresRes.json();
+      this.scores = scoresData.scores ?? [];
+      if (rankRes) {
+        userRank = await rankRes.json();
+      }
     } catch {
       this.scores = [];
     }
@@ -115,20 +123,36 @@ export class Preview extends Scene {
     }
 
     const cx = this.scale.width / 2;
-
-    if (this.scores.length === 0) {
-      this.noScoresText = this.add.bitmapText(cx, 180, 'moghul', 'No scores yet', 14).setOrigin(0.5).setDepth(1);
-      return;
-    }
-
     const startY = 180;
     const lineHeight = 22;
-    for (let i = 0; i < Math.min(this.scores.length, 5); i++) {
-      const entry = this.scores[i]!;
+    const totalLines = 4;
+
+    // Check if the current user is already in the top 3
+    const userInTop3 = this.username !== 'Anonymous' &&
+      this.scores.slice(0, 3).some((s) => s.name === this.username);
+
+    // If user is NOT in top 3 and has a score, reserve the 4th slot for them
+    const showUserIn4th = !userInTop3 && userRank.rank !== null && userRank.score !== null;
+    const topSlots = showUserIn4th ? 3 : totalLines;
+
+    // Build the top lines
+    for (let i = 0; i < topSlots; i++) {
+      const label = i < this.scores.length
+        ? `${i + 1}. ${this.scores[i]!.name}  ${this.scores[i]!.score}`
+        : `${i + 1}. ----------`;
       const text = this.add.bitmapText(
         cx, startY + i * lineHeight,
+        'moghul', label, 16
+      ).setOrigin(0.5).setDepth(1);
+      this.scoreTexts.push(text);
+    }
+
+    // 4th line: user's rank if they're outside top 3, otherwise the 4th top score
+    if (showUserIn4th) {
+      const text = this.add.bitmapText(
+        cx, startY + 3 * lineHeight,
         'moghul',
-        `${i + 1}. ${entry.name}  ${entry.score}`,
+        `${userRank.rank}. ${this.username}  ${userRank.score}`,
         16
       ).setOrigin(0.5).setDepth(1);
       this.scoreTexts.push(text);

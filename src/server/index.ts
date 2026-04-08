@@ -1,5 +1,5 @@
 import express from 'express';
-import { InitResponse, PostScoreRequest, PostScoreResponse, GetHighScoresResponse, HighScoreEntry } from '../shared/types/api';
+import { InitResponse, PostScoreRequest, PostScoreResponse, GetHighScoresResponse, HighScoreEntry, UserRankResponse } from '../shared/types/api';
 import { redis, createServer, context, reddit } from '@devvit/web/server';
 import { createPost } from './core/post';
 
@@ -148,6 +148,34 @@ router.get<unknown, GetHighScoresResponse | { status: string; message: string }>
         status: 'error',
         message: 'Failed to fetch high scores',
       });
+    }
+  }
+);
+
+router.get<unknown, UserRankResponse | { status: string; message: string }>(
+  '/api/user-rank',
+  async (_req, res): Promise<void> => {
+    try {
+      const username = await reddit.getCurrentUsername();
+      if (!username) {
+        res.json({ type: 'user-rank', rank: null, score: null });
+        return;
+      }
+
+      const score = await redis.zScore(HIGH_SCORE_KEY, username);
+      if (score === undefined || score === null) {
+        res.json({ type: 'user-rank', rank: null, score: null });
+        return;
+      }
+
+      // zRange in reverse to count how many scores are above the user's
+      const allScores = await redis.zRange(HIGH_SCORE_KEY, 0, -1, { reverse: true, by: 'rank' });
+      const rank = allScores.findIndex((e) => e.member === username) + 1;
+
+      res.json({ type: 'user-rank', rank: rank > 0 ? rank : null, score });
+    } catch (error) {
+      console.error('Error fetching user rank:', error);
+      res.json({ type: 'user-rank', rank: null, score: null });
     }
   }
 );
