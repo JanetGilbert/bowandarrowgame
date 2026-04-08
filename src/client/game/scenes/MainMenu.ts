@@ -8,6 +8,9 @@ export class MainMenu extends Scene {
   instructionsButton: GameObjects.BitmapText | null = null;
   copyrightText: GameObjects.Text | null = null;
   music: Phaser.Sound.BaseSound | null = null;
+  private progressBarOutline: Phaser.GameObjects.Rectangle | null = null;
+  private progressBar: Phaser.GameObjects.Rectangle | null = null;
+  private needsLoading = false;
 
   constructor() {
     super('MainMenu');
@@ -25,7 +28,86 @@ export class MainMenu extends Scene {
     this.settingsButton = null;
     this.instructionsButton = null;
     this.copyrightText = null;
+    this.progressBarOutline = null;
+    this.progressBar = null;
 
+    // Check if assets still need to be loaded
+    this.needsLoading = !this.textures.exists('archer');
+
+    // Show background and title immediately (loaded by Boot)
+    this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'title_background');
+    this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'coffee_spark', 'Zen', 64).setOrigin(0.5);
+    this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 150, 'coffee_spark', 'Crossbow', 64).setOrigin(0.5);
+
+    if (this.needsLoading) {
+      // Show progress bar while assets load
+      const progressBarWidth = 150;
+      const progressBarHeight = 30;
+      this.progressBarOutline = this.add.rectangle(
+        this.cameras.main.centerX,
+        this.cameras.main.centerY + 100,
+        progressBarWidth,
+        progressBarHeight
+      ).setStrokeStyle(1, 0xfebfff);
+
+      this.progressBar = this.add.rectangle(
+        this.cameras.main.centerX - (progressBarWidth / 2),
+        this.cameras.main.centerY + 100,
+        4,
+        progressBarHeight - 4,
+        0xffffff
+      );
+
+      this.load.on('progress', (progress: number) => {
+        if (this.progressBar) {
+          this.progressBar.width = 4 + (progressBarWidth - 4) * progress;
+        }
+        if (progress >= 1.0) {
+          if (this.progressBarOutline) this.progressBarOutline.setVisible(false);
+          if (this.progressBar) this.progressBar.setVisible(false);
+        }
+      });
+    }
+  }
+
+  preload() {
+    if (!this.needsLoading) return;
+
+    this.load.setPath('assets');
+
+    // Fonts
+    this.load.bitmapFont('moghul', 'fonts/Moghul.png', 'fonts/Moghul.xml');
+    this.load.bitmapFont('moghul_white', 'fonts/moghul_white.png', 'fonts/moghul_white.xml');
+    this.load.bitmapFont('moghul_outline', 'fonts/MoghulOutline.png', 'fonts/MoghulOutline.xml');
+
+    // Images and spritesheets
+    this.load.spritesheet('archer', 'archer.png', { frameWidth: 144, frameHeight: 144 });
+    this.load.image('arrow', 'arrow.png');
+    this.load.image('balloon', 'balloon.png');
+    this.load.spritesheet('balloon_particles', 'balloon_particles.png', { frameWidth: 16, frameHeight: 16 });
+
+    this.load.image('target', 'target.png');
+    this.load.spritesheet('bubble', 'bubble.png', { frameWidth: 50, frameHeight: 50 });
+    this.load.spritesheet('bird', 'bird.png', { frameWidth: 50, frameHeight: 50 });
+    this.load.spritesheet('paper_particles', 'paper_particles.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('balls', 'balls.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.image('snowflake', 'snowflake.png');
+    this.load.spritesheet('snowflake_particles', 'snowflake_particles.png', { frameWidth: 8, frameHeight: 8 });
+
+    // Backgrounds
+    this.load.image('land_background', 'backgrounds/land_background.png');
+    this.load.image('colorful_background', 'backgrounds/colorful_background.png');
+    this.load.image('land2_background', 'backgrounds/land2_background.png');
+    this.load.image('sea_background', 'backgrounds/sea_background.png');
+    this.load.image('snow_background', 'backgrounds/snow_background.png');
+
+    // Sounds
+    this.load.audio('pop', 'sound/pop.wav');
+    this.load.audio('pop2', 'sound/pop2.wav');
+    this.load.audio('rustle', 'sound/rustle.wav');
+    this.load.audio('glass', 'sound/glass.wav');
+    this.load.audio('music', 'sound/cuddle_clouds.mp3');
+    this.load.audio('tennis', 'sound/tennis.wav');
   }
 
   create() {
@@ -47,7 +129,7 @@ export class MainMenu extends Scene {
       this.music = this.sound.add('music', { loop: true, volume: 1.0 });
       this.music.play();
     }
-    }
+  }
  
   /**
    * Positions and (lightly) scales all UI elements based on the current game size.
@@ -58,15 +140,6 @@ export class MainMenu extends Scene {
 
     // Check if cameras are available
     if (!this.cameras.main) return;
-
-    this.background = this.add.image(0, 0, 'title_background').setOrigin(0);
-
-    // Logo – keep aspect but scale down for very small screens
-   // const scaleFactor = Math.min(width / 1024, height / 768);
-
-    // Title
-    this.title = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'coffee_spark', 'Zen', 64).setOrigin(0.5);
-    this.title = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 150, 'coffee_spark', 'Crossbow', 64).setOrigin(0.5);
 
     // Start button
     this.startButton = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 50, 'coffee_spark', 'Start!', 48).setOrigin(0.5);

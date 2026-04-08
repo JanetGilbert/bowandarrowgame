@@ -14,6 +14,6 @@ export class Boot extends Scene {
   }
 
   create() {
-    this.scene.start('Preloader');
+    this.scene.start('MainMenu');
   }
 }
