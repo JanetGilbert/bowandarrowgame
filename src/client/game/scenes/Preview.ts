@@ -36,7 +36,7 @@ export class Preview extends Scene {
     this.add.bitmapText(cx, 35, 'coffee_spark', 'Zen', 48).setOrigin(0.5).setDepth(1);
     this.add.bitmapText(cx, 75, 'coffee_spark', 'Crossbow', 48).setOrigin(0.5).setDepth(1);
 
-    // Welcome text placeholder
+    // Welcome text 
     this.welcomeText = this.add.bitmapText(cx, 120, 'moghul', 'Welcome!', 20).setOrigin(0.5).setDepth(1);
 
     // High scores header
