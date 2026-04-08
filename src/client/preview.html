@@ -11,24 +11,44 @@
         align-items: center;
         justify-content: center;
         height: 100vh;
-        background: #1a1a2e;
+        background: #000;
         font-family: Arial, sans-serif;
+        overflow: hidden;
       }
-      button {
-        padding: 16px 48px;
-        font-size: 24px;
+      #preview-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      #preview-container {
+        width: 100%;
+        height: 100%;
+      }
+      #play-btn {
+        position: absolute;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px 36px;
+        font-size: 20px;
         font-weight: bold;
         color: #fff;
         background: #6c3fa0;
         border: none;
         border-radius: 12px;
         cursor: pointer;
+        z-index: 10;
+        transition: background 0.2s;
       }
-      button:hover { background: #7d4fbf; }
+      #play-btn:hover { background: #7d4fbf; }
     </style>
   </head>
   <body>
-    <button id="play-btn">Play ZenCrossbow</button>
+    <div id="preview-wrapper">
+      <div id="preview-container"></div>
+      <button id="play-btn">Play</button>
+    </div>
+    <script type="module" src="preview.ts"></script>
     <script type="module">
       import { requestExpandedMode } from '@devvit/web/client';
       document.getElementById('play-btn').addEventListener('click', async (e) => {
