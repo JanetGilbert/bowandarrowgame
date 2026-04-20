@@ -10,3 +10,7 @@ devvit install zencrossbow_dev
 To publish:
 devvit upload 
 devvit publish --public
+
+
+Todo:
+Play anonymously?
