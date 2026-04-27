@@ -55,6 +55,8 @@ const { postId, subredditName } = context;
 
 **Post creation:** On app install, server creates custom post via `reddit.submitCustomPost()` with splash screen configuration (icons, descriptions, button labels).
 
+**Leaderboard API note:** `/api/fetch-highscores` accepts optional query param `limit` (clamped to `1..50`) so clients can request size-aware score counts.
+
 ## Development Workflow
 
 **Primary commands** (from `package.json`):
@@ -62,6 +64,16 @@ const { postId, subredditName } = context;
 - `npm run build` - Production builds both client and server
 - `npm run deploy` - Build and upload to Reddit
 - `npm run launch` - Build, deploy, and publish to production
+
+**Local browser preview testing (outside Devvit playtest):**
+- `npm run dev` does **not** start a Vite web server on `localhost:5173`; it only runs watch builds plus playtest.
+- To open `preview.html` directly in a browser, run:
+```powershell
+cd src/client
+npx vite
+```
+- Then open `http://localhost:5173/preview.html`.
+- To simulate taller Reddit post containers, use browser responsive mode (for example, `400x900`) and verify leaderboard spacing.
 
 **Updating splash screen:** Must uninstall then reinstall the app:
 ```powershell
@@ -80,6 +92,8 @@ devvit install zencrossbow_dev
 **Phaser game objects:** Create as classes extending Phaser sprites/containers. See `src/client/game/objects/archer.ts` for pattern with animations, state machines, and input handling.
 
 **Level scene pattern:** Each level scene (e.g., `BalloonLevel`) runs parallel to `Game` scene. Game scene gets level scene reference via `this.scene.get('Game') as Game` to update score/targets. Collision detection handled in level scenes.
+
+**Preview scene leaderboard layout:** In `src/client/game/scenes/Preview.ts`, row count is dynamic based on available vertical space. It computes a max visible row count, requests matching score count from the server (`/api/fetch-highscores?limit=...`), and reserves the last visible line for the current user's rank when they are outside the visible top rows.
 
 **Audio context:** Handle mobile audio suspension in `src/client/game/main.ts` via `visibilitychange` and `focus` events to resume suspended WebAudio context.
 
