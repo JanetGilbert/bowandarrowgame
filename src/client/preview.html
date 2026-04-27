@@ -20,6 +20,16 @@
         width: 100%;
         height: 100%;
       }
+      body.preview-test-mode {
+        background: #1a1a1a;
+      }
+      body.preview-test-mode #preview-wrapper {
+        width: var(--preview-test-width, 400px);
+        height: var(--preview-test-height, 760px);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+      }
       #preview-container {
         width: 100%;
         height: 100%;
@@ -49,6 +59,24 @@
       <button id="play-btn">Play</button>
     </div>
     <script type="module" src="preview.ts"></script>
+    <script type="module">
+      const params = new URLSearchParams(window.location.search);
+      const testWidth = params.get('testWidth');
+      const testHeight = params.get('testHeight');
+
+      const width = testWidth ? Number.parseInt(testWidth, 10) : Number.NaN;
+      const height = testHeight ? Number.parseInt(testHeight, 10) : Number.NaN;
+
+      if (Number.isFinite(width) || Number.isFinite(height)) {
+        document.body.classList.add('preview-test-mode');
+        if (Number.isFinite(width)) {
+          document.body.style.setProperty('--preview-test-width', `${width}px`);
+        }
+        if (Number.isFinite(height)) {
+          document.body.style.setProperty('--preview-test-height', `${height}px`);
+        }
+      }
+    </script>
     <script type="module">
       import { requestExpandedMode } from '@devvit/web/client';
       document.getElementById('play-btn').addEventListener('click', async (e) => {
