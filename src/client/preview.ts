@@ -7,6 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
     type: Phaser.AUTO,
     parent: 'preview-container',
     backgroundColor: '#000000',
+    input: {
+      mouse: {
+        preventDefaultWheel: false,
+      },
+    },
     scale: {
       mode: Phaser.Scale.RESIZE,
       width: '100%',

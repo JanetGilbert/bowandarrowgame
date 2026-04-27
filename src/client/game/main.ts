@@ -22,6 +22,11 @@ const config: Phaser.Types.Core.GameConfig = {
   physics: {
       default: 'arcade'
   },
+  input: {
+    mouse: {
+      preventDefaultWheel: false
+    }
+  },
   scale: {
     // Force portrait orientation with black borders
     mode: Phaser.Scale.FIT,
