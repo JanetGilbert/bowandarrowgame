@@ -128,10 +128,17 @@ router.post<unknown, PostScoreResponse | { status: string; message: string }, Po
 
 router.get<unknown, GetHighScoresResponse | { status: string; message: string }>(
   '/api/fetch-highscores',
-  async (_req, res): Promise<void> => {
+  async (req, res): Promise<void> => {
     try {
-      // Get top 5 scores (reverse order - highest first)
-      const topScores = await redis.zRange(HIGH_SCORE_KEY, 0, 4, { reverse: true, by: 'rank' });
+      const rawLimitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+      const rawLimit = typeof rawLimitParam === 'string' ? rawLimitParam : undefined;
+      const parsedLimit = rawLimit ? Number.parseInt(rawLimit, 10) : 5;
+      const limit = Number.isFinite(parsedLimit)
+        ? Math.max(1, Math.min(parsedLimit, 50))
+        : 5;
+
+      // Get top scores (reverse order - highest first)
+      const topScores = await redis.zRange(HIGH_SCORE_KEY, 0, limit - 1, { reverse: true, by: 'rank' });
 
       const scores: HighScoreEntry[] = topScores.map((entry) => ({
         name: entry.member,

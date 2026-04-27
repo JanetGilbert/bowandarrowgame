@@ -12,6 +12,7 @@ export class Preview extends Scene {
   private balloons: PreviewBalloon[] = [];
   private username: string = '';
   private scores: HighScoreEntry[] = [];
+  private userRank: UserRankResponse = { type: 'user-rank', rank: null, score: null };
 
   private welcomeText: Phaser.GameObjects.BitmapText | null = null;
   private scoreTexts: Phaser.GameObjects.BitmapText[] = [];
@@ -64,6 +65,8 @@ export class Preview extends Scene {
           child.setX(newCx);
         }
       });
+
+      this.renderScoreTable();
     });
   }
 
@@ -119,21 +122,44 @@ export class Preview extends Scene {
   }
 
   private async fetchHighScores() {
-    let userRank: UserRankResponse = { type: 'user-rank', rank: null, score: null };
+    const maxRows = this.getMaxScoreRows();
 
     try {
       const [scoresRes, rankRes] = await Promise.all([
-        fetch('/api/fetch-highscores'),
+        fetch(`/api/fetch-highscores?limit=${maxRows}`),
         this.username !== 'Anonymous' ? fetch('/api/user-rank') : null,
       ]);
       const scoresData = await scoresRes.json();
       this.scores = scoresData.scores ?? [];
       if (rankRes) {
-        userRank = await rankRes.json();
+        this.userRank = await rankRes.json();
       }
     } catch {
       this.scores = [];
+      this.userRank = { type: 'user-rank', rank: null, score: null };
     }
+
+    this.renderScoreTable();
+  }
+
+  private getMaxScoreRows(): number {
+    const startY = 180;
+    const lineHeight = 22;
+    const bottomPadding = 120;
+    return Phaser.Math.Clamp(
+      Math.floor((this.scale.height - startY - bottomPadding) / lineHeight),
+      4,
+      14
+    );
+  }
+
+  private renderScoreTable(): void {
+    for (const text of this.scoreTexts) {
+      if (text.active) {
+        text.destroy();
+      }
+    }
+    this.scoreTexts = [];
 
     if (this.noScoresText && this.noScoresText.active) {
       this.noScoresText.destroy();
@@ -143,15 +169,16 @@ export class Preview extends Scene {
     const cx = this.scale.width / 2;
     const startY = 180;
     const lineHeight = 22;
-    const totalLines = 4;
+    const totalLines = this.getMaxScoreRows();
 
-    // Check if the current user is already in the top 3
-    const userInTop3 = this.username !== 'Anonymous' &&
-      this.scores.slice(0, 3).some((s) => s.name === this.username);
+    // Check if the current user is already in the top lines
+    const userVisibleSlots = Math.max(0, totalLines - 1);
+    const userInTopRows = this.username !== 'Anonymous' &&
+      this.scores.slice(0, userVisibleSlots).some((s) => s.name === this.username);
 
-    // If user is NOT in top 3 and has a score, reserve the 4th slot for them
-    const showUserIn4th = !userInTop3 && userRank.rank !== null && userRank.score !== null;
-    const topSlots = showUserIn4th ? 3 : totalLines;
+    // If user is NOT in top lines and has a score, reserve the last slot for them
+    const showUserInLastRow = !userInTopRows && this.userRank.rank !== null && this.userRank.score !== null;
+    const topSlots = showUserInLastRow ? userVisibleSlots : totalLines;
 
     // Build the top lines
     for (let i = 0; i < topSlots; i++) {
@@ -165,12 +192,12 @@ export class Preview extends Scene {
       this.scoreTexts.push(text);
     }
 
-    // 4th line: user's rank if they're outside top 3, otherwise the 4th top score
-    if (showUserIn4th) {
+    // Last line: user's rank if they're outside the visible top rows.
+    if (showUserInLastRow) {
       const text = this.add.bitmapText(
-        cx, startY + 3 * lineHeight,
+        cx, startY + (totalLines - 1) * lineHeight,
         'moghul',
-        `${userRank.rank}. ${this.username}  ${userRank.score}`,
+        `${this.userRank.rank}. ${this.username}  ${this.userRank.score}`,
         16
       ).setOrigin(0.5).setDepth(1);
       this.scoreTexts.push(text);
