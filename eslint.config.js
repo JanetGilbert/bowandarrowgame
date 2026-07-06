@@ -5,7 +5,9 @@ import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   tseslint.configs.recommended,
-  { ignores: ['webroot'] },
+  // Test files are excluded from the tsconfig projects, so the type-aware
+  // parser can't process them; vitest runs them directly.
+  { ignores: ['webroot', '**/*.test.ts'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['tools/**/*.{ts,tsx,mjs,cjs,js}'],

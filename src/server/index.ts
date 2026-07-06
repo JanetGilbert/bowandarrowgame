@@ -2,6 +2,7 @@ import express from 'express';
 import { InitResponse, PostScoreRequest, PostScoreResponse, GetHighScoresResponse, HighScoreEntry, UserRankResponse } from '../shared/types/api';
 import { redis, createServer, context, reddit } from '@devvit/web/server';
 import { createPost } from './core/post';
+import { sanitizeName } from './core/sanitizeName';
 
 const app = express();
 
@@ -95,7 +96,26 @@ router.post<unknown, PostScoreResponse | { status: string; message: string }, Po
     try {
       const { name, score } = req.body;
 
-      if (!name || typeof score !== 'number') {
+      if (typeof score !== 'number' || !Number.isFinite(score)) {
+        res.status(400).json({
+          status: 'error',
+          message: 'Name and score are required',
+        });
+        return;
+      }
+
+      // Prefer the authenticated Reddit username so the API can't be used to
+      // store arbitrary names; fall back to the submitted name (sanitized)
+      // only when no username is available.
+      let username: string | undefined;
+      try {
+        username = await reddit.getCurrentUsername();
+      } catch {
+        username = undefined;
+      }
+      const safeName = sanitizeName(username || (typeof name === 'string' ? name : ''));
+
+      if (!safeName) {
         res.status(400).json({
           status: 'error',
           message: 'Name and score are required',
@@ -106,10 +126,10 @@ router.post<unknown, PostScoreResponse | { status: string; message: string }, Po
       // Add score to sorted set (higher scores get higher rank)
       // Use name as member, score as the score value
       // If name exists, update with new score only if higher
-      const existingScore = await redis.zScore(HIGH_SCORE_KEY, name);
-      
+      const existingScore = await redis.zScore(HIGH_SCORE_KEY, safeName);
+
       if (!existingScore || score > existingScore) {
-        await redis.zAdd(HIGH_SCORE_KEY, { member: name, score });
+        await redis.zAdd(HIGH_SCORE_KEY, { member: safeName, score });
       }
 
       res.json({
@@ -140,8 +160,10 @@ router.get<unknown, GetHighScoresResponse | { status: string; message: string }>
       // Get top scores (reverse order - highest first)
       const topScores = await redis.zRange(HIGH_SCORE_KEY, 0, limit - 1, { reverse: true, by: 'rank' });
 
+      // Sanitize on the way out too, so entries stored before validation
+      // existed still display clean.
       const scores: HighScoreEntry[] = topScores.map((entry) => ({
-        name: entry.member,
+        name: sanitizeName(entry.member) || 'Anonymous',
         score: entry.score,
       }));
 
@@ -163,7 +185,9 @@ router.get<unknown, UserRankResponse | { status: string; message: string }>(
   '/api/user-rank',
   async (_req, res): Promise<void> => {
     try {
-      const username = await reddit.getCurrentUsername();
+      const rawUsername = await reddit.getCurrentUsername();
+      // Scores are stored under the sanitized name, so look up the same way.
+      const username = rawUsername ? sanitizeName(rawUsername) : '';
       if (!username) {
         res.json({ type: 'user-rank', rank: null, score: null });
         return;
@@ -217,6 +241,29 @@ router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
     res.status(400).json({
       status: 'error',
       message: 'Failed to create post',
+    });
+  }
+});
+
+router.post('/internal/menu/clean-highscores', async (_req, res): Promise<void> => {
+  try {
+    const entries = await redis.zRange(HIGH_SCORE_KEY, 0, -1, { by: 'rank' });
+    const vandalized = entries
+      .map((e) => e.member)
+      .filter((member) => sanitizeName(member) !== member);
+
+    if (vandalized.length > 0) {
+      await redis.zRem(HIGH_SCORE_KEY, vandalized);
+    }
+
+    res.json({
+      showToast: `Removed ${vandalized.length} invalid high score entr${vandalized.length === 1 ? 'y' : 'ies'}.`,
+    });
+  } catch (error) {
+    console.error('Error cleaning high scores:', error);
+    res.status(400).json({
+      status: 'error',
+      message: 'Failed to clean high scores',
     });
   }
 });

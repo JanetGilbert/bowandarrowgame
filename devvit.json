@@ -29,6 +29,13 @@
         "location": "subreddit",
         "forUserType": "moderator",
         "endpoint": "/internal/menu/post-create"
+      },
+      {
+        "label": "Clean high score table",
+        "description": "Remove high score entries with invalid or profane names",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/clean-highscores"
       }
     ]
   },
